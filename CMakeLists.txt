@@ -24,6 +24,7 @@ if(WIN32)
 add_executable(sh2_ftdi_logger
     sh2_ftdi_logger.cpp
 	FtdiHalWin.cpp
+	FtdiHal.cpp
 	TimerServiceWin.cpp
 	LoggerApp.cpp
 	ftd2xx.h
@@ -38,6 +39,7 @@ else()
 add_executable(sh2_ftdi_logger
     sh2_ftdi_logger.cpp
 	FtdiHalRpi.cpp
+	FtdiHal.cpp
 	TimerServiceRpi.cpp
 	LoggerApp.cpp
 	ftd2xx.h
