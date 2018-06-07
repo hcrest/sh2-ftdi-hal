@@ -41,6 +41,15 @@ Usage: sh2_ftdi_logger.exe <out.dsf> [--deviceNumber=<id>] [--rate=<rate>] [--ra
    --calEnable=0x<mask> - cal enable mask.  Bits: Planar, A, G, M.  Default 0x8
 ```
 
+-----------------------------------------------------------------------------------------------------------
+|   | ALL                         | 9AGM             | 6AG                  | 6AM                         |
+-----------------------------------------------------------------------------------------------------------
+|   | ROTATION_VECTOR             | ROTATION_VECTOR  | GAME_ROTATION_VECTOR | GEOMAGNETIC_ROTATION_VECTOR |
+|   | GAME_ROTATION_VECTOR        |                  |                      |                             |
+|   | GEOMAGNETIC_ROTATION_VECTOR |	                 | 	                    |                             |
+-----------------------------------------------------------------------------------------------------------
+
+
 ### Examples 
 
 Run DSF logger in '6ag' mode to enable the GameRV sensors along with the associated raw sensor reports. 
