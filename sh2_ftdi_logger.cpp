@@ -81,7 +81,7 @@ void usage(const char* myname) {
             "   --raw                - include raw data and use SAMPLE_TIME for timing\n"
             "   --calibrated         - include calibrated output sensors\n"
             "   --uncalibrated       - include uncalibrated output sensors\n"
-            "   --mode=<mode>        - sensors types to log.  6ag, 9agm, 9am or all.\n"
+            "   --mode=<mode>        - sensors types to log.  9agm, 6ag, 6am or all.\n"
             "   --dcdAutoSave        - enable DCD auto saving.  No dcd save by default.\n"
             "   --clearDcd           - clear DCD and reset upon startup.\n"
             "   --calEnable=0x<mask> - cal enable mask.  Bits: Planar, A, G, M.  Default 0x8\n",
