@@ -1,7 +1,7 @@
 # SH2 (No-RTOS) DSF Logger over FTDI 
 
 DSF Logger configures and communicates with the SensorHub (SH2) in SHTP over UART protocol through the FTDI interface. A group of sensors will be enabled based on the operating mode and rate specified. 
-The output SH2 sensor reports are saved in a log file in DSF format. 
+The output SH2 sensor reports will be saved to a log file in DSF format. 
 
 ## Getting Started
 
@@ -17,7 +17,9 @@ Run CMAKE to generate the makefile. CMAKE detects the platform which is run on (
 cmake CMakeLists.txt
 ```
 
-Run MAKE to compile and build the application
+For Windows, open the generated solution (sh2_ftdi_logger.sln) in the Visual Studio to build the application.
+
+For Linux, run MAKE to compile and build the application.
 ```
 make -f Makefile
 ```
