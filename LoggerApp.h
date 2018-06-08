@@ -27,7 +27,11 @@ enum SensorMode {
     SENSOR_MODE_9AGM,
     SENSOR_MODE_6AG,
     SENSOR_MODE_6AM,
-    SENSOR_MODE_ALL,
+    SENSOR_MODE_6GM,
+    SENSOR_MODE_3A,
+    SENSOR_MODE_3G,
+    SENSOR_MODE_3M,
+    SENSOR_MODE_ALL
 };
 
 // =================================================================================================

@@ -79,7 +79,6 @@ static uint32_t Sh2HalGetTimeUs(sh2_Hal_t* self);
 // =================================================================================================
 // LOCAL VARIABLES
 // =================================================================================================
-static bool const USE_SAMPLE_TIME = false;
 
 static TimerSrv* timer_;
 static DsfLogger* logger_;
@@ -88,6 +87,7 @@ static FtdiHal* ftdiHal_;
 static State state_ = State::Idle;
 
 // Timestamp
+static bool useSampleTime = false;
 static double startTime = 0;
 static double currTime = 0;
 static double lastSampleTime = 0;
@@ -181,10 +181,24 @@ void mySensorCallback(void* cookie, sh2_SensorEvent_t* pEvent) {
     sh2_SensorValue_t value;
     sh2_decodeSensorEvent(&value, pEvent);
 
-    if (USE_SAMPLE_TIME) {
-        currTime = HasSampleTime(value.sensorId) ? (value.un.rawAccelerometer.timestamp * 1e-6)
-                                                 : lastSampleTime;
-        lastSampleTime = currTime;
+    if (useSampleTime) {
+        switch (value.sensorId) {
+        case SH2_RAW_ACCELEROMETER:
+            currTime = value.un.rawAccelerometer.timestamp * 1e-6;
+            lastSampleTime = currTime;
+            break;
+        case SH2_RAW_GYROSCOPE:
+            currTime = value.un.rawGyroscope.timestamp * 1e-6;
+            lastSampleTime = currTime;
+            break;
+        case SH2_RAW_MAGNETOMETER:
+            currTime = value.un.rawMagnetometer.timestamp * 1e-6;
+            lastSampleTime = currTime;
+            break;
+        default:
+            currTime = lastSampleTime;
+            break;
+        }
     } else {
         currTime = value.timestamp * 1e-6;
     }
@@ -441,27 +455,73 @@ static bool HasSampleTime(uint8_t sensorId) {
 static void UpdateSensorList(SensorList_t* sensorsToEnable, LoggerApp::appConfig_s* pConfig) {
 
     if (pConfig->outputRaw) {
-        sensorsToEnable->push_back(SH2_RAW_ACCELEROMETER);
-        sensorsToEnable->push_back(SH2_RAW_GYROSCOPE);
-        sensorsToEnable->push_back(SH2_RAW_MAGNETOMETER);
+        useSampleTime = true;
+        switch (pConfig->sensorMode) {
+            default:
+            case SENSOR_MODE_9AGM:
+            case SENSOR_MODE_ALL:
+                sensorsToEnable->push_back(SH2_RAW_ACCELEROMETER);
+                sensorsToEnable->push_back(SH2_RAW_GYROSCOPE);
+                sensorsToEnable->push_back(SH2_RAW_MAGNETOMETER);
+                break;
+            case SENSOR_MODE_6AG:
+                sensorsToEnable->push_back(SH2_RAW_ACCELEROMETER);
+                sensorsToEnable->push_back(SH2_RAW_GYROSCOPE);
+                break;
+            case SENSOR_MODE_6AM:
+                sensorsToEnable->push_back(SH2_RAW_ACCELEROMETER);
+                sensorsToEnable->push_back(SH2_RAW_MAGNETOMETER);
+                break;
+            case SENSOR_MODE_6GM:
+                sensorsToEnable->push_back(SH2_RAW_GYROSCOPE);
+                sensorsToEnable->push_back(SH2_RAW_MAGNETOMETER);
+                break;
+            case SENSOR_MODE_3A:
+                sensorsToEnable->push_back(SH2_RAW_ACCELEROMETER);
+                break;
+            case SENSOR_MODE_3G:
+                sensorsToEnable->push_back(SH2_RAW_GYROSCOPE);
+                break;
+            case SENSOR_MODE_3M:
+                sensorsToEnable->push_back(SH2_RAW_MAGNETOMETER);
+                break;
+        }
     }
 
     if (pConfig->outputCalibrated) {
         switch (pConfig->sensorMode) {
             default:
             case SENSOR_MODE_9AGM:
-            case SENSOR_MODE_ALL:
                 sensorsToEnable->push_back(SH2_ACCELEROMETER);
                 sensorsToEnable->push_back(SH2_GYROSCOPE_CALIBRATED);
                 sensorsToEnable->push_back(SH2_MAGNETIC_FIELD_CALIBRATED);
                 break;
-
+            case SENSOR_MODE_ALL:
+                sensorsToEnable->push_back(SH2_ACCELEROMETER);
+                sensorsToEnable->push_back(SH2_GYROSCOPE_CALIBRATED);
+                sensorsToEnable->push_back(SH2_MAGNETIC_FIELD_CALIBRATED);
+                sensorsToEnable->push_back(SH2_LINEAR_ACCELERATION);
+                sensorsToEnable->push_back(SH2_GRAVITY);
+                break;
             case SENSOR_MODE_6AG:
                 sensorsToEnable->push_back(SH2_ACCELEROMETER);
                 sensorsToEnable->push_back(SH2_GYROSCOPE_CALIBRATED);
                 break;
             case SENSOR_MODE_6AM:
                 sensorsToEnable->push_back(SH2_ACCELEROMETER);
+                sensorsToEnable->push_back(SH2_MAGNETIC_FIELD_CALIBRATED);
+                break;
+            case SENSOR_MODE_6GM:
+                sensorsToEnable->push_back(SH2_GYROSCOPE_CALIBRATED);
+                sensorsToEnable->push_back(SH2_MAGNETIC_FIELD_CALIBRATED);
+                break;
+            case SENSOR_MODE_3A:
+                sensorsToEnable->push_back(SH2_ACCELEROMETER);
+                break;
+            case SENSOR_MODE_3G:
+                sensorsToEnable->push_back(SH2_GYROSCOPE_CALIBRATED);
+                break;
+            case SENSOR_MODE_3M:
                 sensorsToEnable->push_back(SH2_MAGNETIC_FIELD_CALIBRATED);
                 break;
         }
@@ -475,11 +535,22 @@ static void UpdateSensorList(SensorList_t* sensorsToEnable, LoggerApp::appConfig
                 sensorsToEnable->push_back(SH2_GYROSCOPE_UNCALIBRATED);
                 sensorsToEnable->push_back(SH2_MAGNETIC_FIELD_UNCALIBRATED);
                 break;
-
             case SENSOR_MODE_6AG:
                 sensorsToEnable->push_back(SH2_GYROSCOPE_UNCALIBRATED);
                 break;
             case SENSOR_MODE_6AM:
+                sensorsToEnable->push_back(SH2_MAGNETIC_FIELD_UNCALIBRATED);
+                break;
+            case SENSOR_MODE_6GM:
+                sensorsToEnable->push_back(SH2_GYROSCOPE_UNCALIBRATED);
+                sensorsToEnable->push_back(SH2_MAGNETIC_FIELD_UNCALIBRATED);
+                break;
+            case SENSOR_MODE_3A:
+                break;
+            case SENSOR_MODE_3G:
+                sensorsToEnable->push_back(SH2_GYROSCOPE_UNCALIBRATED);
+                break;
+            case SENSOR_MODE_3M:
                 sensorsToEnable->push_back(SH2_MAGNETIC_FIELD_UNCALIBRATED);
                 break;
         }
@@ -500,6 +571,10 @@ static void UpdateSensorList(SensorList_t* sensorsToEnable, LoggerApp::appConfig
             sensorsToEnable->push_back(SH2_ROTATION_VECTOR);
             sensorsToEnable->push_back(SH2_GAME_ROTATION_VECTOR);
             sensorsToEnable->push_back(SH2_GEOMAGNETIC_ROTATION_VECTOR);
+        case SENSOR_MODE_6GM:
+        case SENSOR_MODE_3A:
+        case SENSOR_MODE_3G:
+        case SENSOR_MODE_3M:
             break;
     }
 }
@@ -526,7 +601,7 @@ int LogFrs(uint16_t recordId, char const* name) {
 // -------------------------------------------------------------------------------------------------
 static void LogAllFrsBNO080() {
     if (LogFrs(STATIC_CALIBRATION_AGM, "scd") == 0) {
-        logger_->logMessage("# No SCD present, logging nominal calibration");
+        logger_->logMessage("# No SCD present, logging nominal calibration as 'scd'.");
         LogFrs(NOMINAL_CALIBRATION, "scd");
     }
 

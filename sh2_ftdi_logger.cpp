@@ -81,7 +81,7 @@ void usage(const char* myname) {
             "   --raw                - include raw data and use SAMPLE_TIME for timing\n"
             "   --calibrated         - include calibrated output sensors\n"
             "   --uncalibrated       - include uncalibrated output sensors\n"
-            "   --mode=<mode>        - sensors types to log.  9agm, 6ag, 6am or all.\n"
+            "   --mode=<mode>        - sensors types to log.  9agm, 6ag, 6am, 6gm, 3a, 3g, 3m or all.\n"
             "   --dcdAutoSave        - enable DCD auto saving.  No dcd save by default.\n"
             "   --clearDcd           - clear DCD and reset upon startup.\n"
             "   --calEnable=0x<mask> - cal enable mask.  Bits: Planar, A, G, M.  Default 0x8\n",
@@ -125,6 +125,14 @@ int main(int argc, const char* argv[]) {
                     appConfig.sensorMode = SENSOR_MODE_6AG;
                 } else if (strcmp(val, "6am") == 0) {
                     appConfig.sensorMode = SENSOR_MODE_6AM;
+                } else if (strcmp(val, "6gm") == 0) {
+                    appConfig.sensorMode = SENSOR_MODE_6GM;
+                } else if (strcmp(val, "3a") == 0) {
+                    appConfig.sensorMode = SENSOR_MODE_3A;
+                } else if (strcmp(val, "3g") == 0) {
+                    appConfig.sensorMode = SENSOR_MODE_3G;
+                } else if (strcmp(val, "3m") == 0) {
+                    appConfig.sensorMode = SENSOR_MODE_3M;
                 } else if (strcmp(val, "all") == 0) {
                     appConfig.sensorMode = SENSOR_MODE_ALL;
                 } else {

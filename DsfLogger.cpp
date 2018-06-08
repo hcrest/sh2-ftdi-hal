@@ -141,8 +141,8 @@ void DsfLogger::logProductIds(sh2_ProductIds_t ids) {
         outFile_ << static_cast<uint32_t>(ids.entry[i].swPartNumber) << " ";
         outFile_ << static_cast<uint32_t>(ids.entry[i].swVersionMajor) << ".";
         outFile_ << static_cast<uint32_t>(ids.entry[i].swVersionMinor) << ".";
-        outFile_ << static_cast<uint32_t>(ids.entry[i].swBuildNumber) << ".";
-        outFile_ << static_cast<uint32_t>(ids.entry[i].swVersionPatch) << "\"\n";
+        outFile_ << static_cast<uint32_t>(ids.entry[i].swVersionPatch) << ".";
+        outFile_ << static_cast<uint32_t>(ids.entry[i].swBuildNumber) << "\"\n";
     }
 }
 
@@ -181,7 +181,7 @@ void DsfLogger::logSensorValue(sh2_SensorValue_t* pValue, double currTime) {
             outFile_ << "." << id << " ";
             outFile_ << std::fixed << std::setprecision(9) << currTime << ",";
             outFile_.unsetf(std::ios_base::floatfield);
-            outFile_ << extender.increment() << ",";
+            outFile_ << extender.extend(pValue->sequence) << ",";
             outFile_ << pValue->un.rotationVector.real << ",";
             outFile_ << pValue->un.rotationVector.j << ","; // Convert ENU -> NED
             outFile_ << pValue->un.rotationVector.i << ",";
@@ -200,7 +200,7 @@ void DsfLogger::logSensorValue(sh2_SensorValue_t* pValue, double currTime) {
             outFile_ << "." << id << " ";
             outFile_ << std::fixed << std::setprecision(9) << currTime << ",";
             outFile_.unsetf(std::ios_base::floatfield);
-            outFile_ << extender.increment() << ",";
+            outFile_ << extender.extend(pValue->sequence) << ",";
             outFile_ << pValue->un.gyroIntegratedRV.real << ",";
             outFile_ << pValue->un.gyroIntegratedRV.j << ","; // Convert ENU -> NED
             outFile_ << pValue->un.gyroIntegratedRV.i << ",";
@@ -218,7 +218,7 @@ void DsfLogger::logSensorValue(sh2_SensorValue_t* pValue, double currTime) {
             outFile_ << "." << id << " ";
             outFile_ << std::fixed << std::setprecision(9) << currTime << ",";
             outFile_.unsetf(std::ios_base::floatfield);
-            outFile_ << extender.increment() << ",";
+            outFile_ << extender.extend(pValue->sequence) << ",";
             outFile_ << pValue->un.gameRotationVector.real << ",";
             outFile_ << pValue->un.gameRotationVector.j << ","; // Convert ENU -> NED
             outFile_ << pValue->un.gameRotationVector.i << ",";
@@ -235,7 +235,7 @@ void DsfLogger::logSensorValue(sh2_SensorValue_t* pValue, double currTime) {
             outFile_ << "." << id << " ";
             outFile_ << std::fixed << std::setprecision(9) << currTime << ",";
             outFile_.unsetf(std::ios_base::floatfield);
-            outFile_ << extender.increment() << ",";
+            outFile_ << extender.extend(pValue->sequence) << ",";
             outFile_ << pValue->un.geoMagRotationVector.real << ",";
             outFile_ << pValue->un.geoMagRotationVector.j << ","; // Convert ENU -> NED
             outFile_ << pValue->un.geoMagRotationVector.i << ",";

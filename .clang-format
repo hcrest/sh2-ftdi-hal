@@ -1,0 +1,95 @@
+# Seems like the best fit based on some quick checks.
+BasedOnStyle: LLVM
+
+# 4 spaces / tab
+IndentWidth: 4
+
+#public/private/protected are not indented relative to the start of
+# the block (+4 from IndentWidth,  -4 from AccessModifierOffset)
+AccessModifierOffset: -4
+
+
+# if params/args don't fit on a single line, they each get their own
+# line.
+# e.g. doTheThing(a,
+#                 someLongArgumentThatForcesALineContinuation,
+#                 b,
+#                 c) {
+#
+#      not
+#
+#      doTheThing(a,
+#                 someLongArgumentThatForcesALineContinuation,
+#                 b, c) {
+BinPackParameters: false
+BinPackArguments: false
+
+# We discussed making the first parameter in multi-line parameter list
+# start at an 8-space indent (rather than aligned with the paren).
+# It seems like a combination of BinPack*: false and
+# AlignAfterOpenBracket: false would accomplish this. However, it
+# appears that setting AlignAfterOpenBracket to false prevents
+# BinPack*: false from having an effect. I think that the
+# paren-alignment is easier to read than the binpacked param/arg
+# lists, so this is a compromise for clang-format.
+AlignAfterOpenBracket: true
+
+# Experimentally tweaking around with this value removed a couple of
+# weird cases where clang-format inserted a break between the paren
+# and first parameter/argument of a function that didn't seem
+# necessary.
+PenaltyBreakBeforeFirstCallParameter: 1000
+
+# Single line compound statements are the devil's work
+AllowShortIfStatementsOnASingleLine: false
+AllowShortFunctionsOnASingleLine: false
+AllowShortCaseLabelsOnASingleLine: false
+
+# When a line break is inserted (not start of a block), double-indent.
+# This makes it obvious that the continued portion of the line is
+# *not* a block, but is just whitespace
+ContinuationIndentWidth: 8
+
+# switch (var) {
+#     case 1:
+#       break;
+#
+# not
+#
+# switch (var) {
+# case 1:
+#    break;
+IndentCaseLabels: true
+
+#clang-format tries to consolidate empty lines. Assume that at most 2
+# blank lines are used for reading clarity (separating
+# logically-grouped declarations, comments, functions, etc)
+MaxEmptyLinesToKeep: 2
+
+#If a line break is inserted between the return type and a long function
+# name+first-param-type, do not tab in the function name.
+IndentWrappedFunctionNames: false
+
+# Constructor initializers are not configurable exactly the way the
+# original conventions describe them.
+# 1. There doesn't appear to be a way to force initializers to each
+#    get a line, though once the list exceeds the line length it will
+#    get its act together.
+# 2. Initializer list is indented 4, not 8.
+ConstructorInitializerAllOnOneLineOrOnePerLine: true
+BreakConstructorInitializersBeforeComma: true
+# This option appears to clash with the all-on-one-line or
+# one-per-line option. If it is defined, then line breaks are inserted
+# only where needed.
+# I think it's better to have the indent be 4 and to keep one
+# initializer per line.
+#ConstructorIntializerIndentWidth: 8
+
+# *'s in pointer types are left* aligned, not right *aligned
+PointerAlignment: Left
+
+# Override the commonly used column limit of 80
+ColumnLimit: 100
+
+# Use C++03-compatible syntax ( A<A<int> >, not A<A<int>>)
+Standard: Cpp03
