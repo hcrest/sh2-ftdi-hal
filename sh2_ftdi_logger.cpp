@@ -74,7 +74,7 @@ void breakHandler(int) {
 void usage(const char* myname) {
     fprintf(stderr,
             "Usage: %s <out.dsf> [--deviceNumber=<id>] [--rate=<rate>] [--raw] [--calibrated] "
-            "[--uncalibrated] [--mode=<9agm,6ag,6am,all>] [--dcdAutoSave] [--calEnable=0x<mask>]\n"
+            "[--uncalibrated] [--mode=<9agm,6ag,6am,6gm,3a,3g,3m,all>] [--dcdAutoSave] [--calEnable=0x<mask>]\n"
             "   out.dsf              - output dsf file\n"
             "   --deviceNumber=<id>  - which device to open.  0 for a single device.\n"
             "   --rate=<rate>        - requested sampling rate for all sensors.  Default: 100Hz\n"

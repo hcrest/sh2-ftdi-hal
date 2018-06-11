@@ -28,14 +28,14 @@ make -f Makefile
 ## Running the application
 
 ```
-Usage: sh2_ftdi_logger.exe <out.dsf> [--deviceNumber=<id>] [--rate=<rate>] [--raw] [--calibrated] [--uncalibrated] [--mode=<9agm,6ag,6am,all>] [--dcdAutoSave] [--calEnable=0x<mask>]
+Usage: sh2_ftdi_logger.exe <out.dsf> [--deviceNumber=<id>] [--rate=<rate>] [--raw] [--calibrated] [--uncalibrated] [--mode=<9agm,6ag,6am,6gm,3a,3g,3m,all>] [--dcdAutoSave] [--calEnable=0x<mask>]
    out.dsf              - output dsf file
    --deviceNumber=<id>  - which device to open.  0 for a single device.
    --rate=<rate>        - requested sampling rate for all sensors.  Default: 100Hz
    --raw                - include raw data and use SAMPLE_TIME for timing
    --calibrated         - include calibrated output sensors
    --uncalibrated       - include uncalibrated output sensors
-   --mode=<mode>        - sensors types to log.  6ag, 9agm, 9am or all.
+   --mode=<mode>        - sensors types to log.  9agm, 6ag, 6am, 6gm, 3a, 3g, 3m or all.
    --dcdAutoSave        - enable DCD auto saving.  No dcd save by default.
    --clearDcd           - clear DCD and reset upon startup.
    --calEnable=0x<mask> - cal enable mask.  Bits: Planar, A, G, M.  Default 0x8
