@@ -16,6 +16,17 @@ The output SH2 sensor reports will be saved to a log file in DSF format.
 git clone --recursive http://github.hcrest.com/hillcrest/sh2-nortos-ftdi-dsf.git
 ```
 
+* Adjust the receive buffer latency timer. Reduce the latency timer from the default value of 16 milliseconds to 1 millisecond. 
+** For Windows application, the latency timer has been adjusted automatically. 
+** For Linux, use the following examples, assuming the device is connected to the ttyUSB0 serial port.
+```
+# cat /sys/bus/usb-serial/devices/ttyUSB0/latency_timer
+16
+# echo 1 > /sys/bus/usb-serial/devices/ttyUSB0/latency_timer
+# cat /sys/bus/usb-serial/devices/ttyUSB0/latency_timer
+1
+```
+
 ## Building from Source
 
 Run CMAKE to generate the makefile. CMAKE detects the platform which is run on (Windows/Linux) to generate the correct makefile.
