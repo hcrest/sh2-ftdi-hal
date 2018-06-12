@@ -3,14 +3,15 @@
 DSF Logger configures and communicates with the SensorHub (SH2) in SHTP over UART protocol through the FTDI interface. A group of sensors will be enabled based on the operating mode and rate specified. 
 The output SH2 sensor reports will be saved to a log file in DSF format. 
 
-## Getting Started
+## Prerequisites
 
-### Prerequisites
+Clone this repository using the --recursive flag with git:
 
-Clone the repository along with the 'sh2' library submodule to the local machine.
-Install CMAKE
+  * git clone --recursive http://github.hcrest.com/hillcrest/sh2-nortos-ftdi-dsf.git
 
-### Compile and Build from Source
+Install CMAKE on the build machine.
+
+## Building from Source
 
 Run CMAKE to generate the makefile. CMAKE detects the platform which is run on (Windows/Linux) to generate the correct makefile.
 ```
