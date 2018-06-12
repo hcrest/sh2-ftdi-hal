@@ -17,8 +17,8 @@ git clone --recursive http://github.hcrest.com/hillcrest/sh2-nortos-ftdi-dsf.git
 ```
 
 * Adjust the receive buffer latency timer. Reduce the latency timer from the default value of 16 milliseconds to 1 millisecond. 
-** For Windows application, the latency timer has been adjusted automatically. 
-** For Linux, use the following examples, assuming the device is connected to the ttyUSB0 serial port.
+  * For Windows application, the latency timer has been adjusted automatically. 
+  * For Linux, use the following examples, assuming the device is connected to the ttyUSB0 serial port.
 ```
 # cat /sys/bus/usb-serial/devices/ttyUSB0/latency_timer
 16
