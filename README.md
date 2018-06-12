@@ -2,15 +2,16 @@
 
 DSF Logger configures and communicates with the SensorHub (SH2) in SHTP over UART protocol through the FTDI interface. A group of sensors will be enabled based on the operating mode and rate specified. 
 The output SH2 sensor reports will be saved to a log file in DSF format. 
+## Requirements
 
-## Prerequisites
+* CMAKE on the build machine
+
+## Setup
 
 * Clone this repository using the --recursive flag with git:
 ```
 git clone --recursive http://github.hcrest.com/hillcrest/sh2-nortos-ftdi-dsf.git
 ```
-
-* Install CMAKE on the build machine.
 
 ## Building from Source
 
@@ -52,7 +53,7 @@ Usage: sh2_ftdi_logger.exe <out.dsf> [--deviceNumber=<id>] [--rate=<rate>] [--ra
 | **_6am_** | GEOMAGNETIC_ROTATION_VECTOR | ACCELEROMETER <br/> MAGNETIC_FIELD_CALIBRATED | MAGNETIC_FIELD_UNCALIBRATED | RAW_ACCELEROMETER <br/> RAW_MAGNETOMETER |
 | **_6gm_** |  | GYROSCOPE_CALIBRATED <br/> MAGNETIC_FIELD_CALIBRATED | GYROSCOPE_UNCALIBRATED <br/> MAGNETIC_FIELD_UNCALIBRATED | RAW_GYROSCOPE <br/> RAW_MAGNETOMETER |
 | **_3a_** | | ACCELEROMETER | | RAW_ACCELEROMETER |
-| **_3a_** | | GYROSCOPE_CALIBRATED | GYROSCOPE_UNCALIBRATED | RAW_GYROSCOPE |
+| **_3g_** | | GYROSCOPE_CALIBRATED | GYROSCOPE_UNCALIBRATED | RAW_GYROSCOPE |
 | **_3m_** | | MAGNETIC_FIELD_CALIBRATED | MAGNETIC_FIELD_UNCALIBRATED | RAW_MAGNETOMETER |
 
 ### Examples 
