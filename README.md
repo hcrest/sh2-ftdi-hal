@@ -5,11 +5,12 @@ The output SH2 sensor reports will be saved to a log file in DSF format.
 
 ## Prerequisites
 
-Clone this repository using the --recursive flag with git:
+* Clone this repository using the --recursive flag with git:
+```
+git clone --recursive http://github.hcrest.com/hillcrest/sh2-nortos-ftdi-dsf.git
+```
 
-  * git clone --recursive http://github.hcrest.com/hillcrest/sh2-nortos-ftdi-dsf.git
-
-Install CMAKE on the build machine.
+* Install CMAKE on the build machine.
 
 ## Building from Source
 
