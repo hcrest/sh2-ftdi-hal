@@ -61,6 +61,7 @@ public:
         bool dcdAutoSave = false;
         bool clearDcd = false;
         uint8_t calEnableMask = 0x8; // TODO review data type
+        bool orientationNed = true;
     };
 
     int init(appConfig_s* appConfig, TimerSrv* timer, FtdiHal* ftdiHal, DsfLogger* logger);

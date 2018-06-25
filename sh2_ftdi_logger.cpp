@@ -74,7 +74,8 @@ void breakHandler(int) {
 void usage(const char* myname) {
     fprintf(stderr,
             "Usage: %s <out.dsf> [--deviceNumber=<id>] [--rate=<rate>] [--raw] [--calibrated] "
-            "[--uncalibrated] [--mode=<9agm,6ag,6am,6gm,3a,3g,3m,all>] [--dcdAutoSave] [--calEnable=0x<mask>]\n"
+            "[--uncalibrated] [--mode=<9agm,6ag,6am,6gm,3a,3g,3m,all>] [--dcdAutoSave] [--calEnable=0x<mask>]"
+            "[--orientation=enu,ned]\n"
             "   out.dsf              - output dsf file\n"
             "   --deviceNumber=<id>  - which device to open.  0 for a single device.\n"
             "   --rate=<rate>        - requested sampling rate for all sensors.  Default: 100Hz\n"
@@ -84,7 +85,8 @@ void usage(const char* myname) {
             "   --mode=<mode>        - sensors types to log.  9agm, 6ag, 6am, 6gm, 3a, 3g, 3m or all.\n"
             "   --dcdAutoSave        - enable DCD auto saving.  No dcd save by default.\n"
             "   --clearDcd           - clear DCD and reset upon startup.\n"
-            "   --calEnable=0x<mask> - cal enable mask.  Bits: Planar, A, G, M.  Default 0x8\n",
+            "   --calEnable=0x<mask> - cal enable mask.  Bits: Planar, A, G, M.  Default 0x8\n"
+            "   --orientation=<orientation> - system orientation. enu, ned. Default: ned\n",
             myname);
 }
 
@@ -146,6 +148,13 @@ int main(int argc, const char* argv[]) {
             } else if (strstr(arg, "--calEnable=") == arg) {
                 const char* val = strchr(arg, '=') + 1;
                 appConfig.calEnableMask = (uint8_t)strtol(val, NULL, 0);
+            } else if (strstr(arg, "--orientation=") == arg) {
+                const char* val = strchr(arg, '=') + 1;
+                if (strcmp(val, "enu") == 0) {
+                    appConfig.orientationNed = false;
+                } else {
+                    appConfig.orientationNed = true;
+                }
             } else {
                 fprintf(stderr, "Unknown argument: %s\n", arg);
                 argError = true;
@@ -180,7 +189,7 @@ int main(int argc, const char* argv[]) {
 	runApp_ = true;
 
 	// Initialize DSF Logger
-    bool rv = logger_.init(outFilePath);
+    bool rv = logger_.init(outFilePath, appConfig.orientationNed);
     if (!rv) {
         std::cout << "ERROR: Unable to open file:  \"" << outFilePath << "\"" << std::endl;
         return -1;

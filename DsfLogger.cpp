@@ -58,8 +58,9 @@ private:
 // -------------------------------------------------------------------------------------------------
 // DsfLogger::init
 // -------------------------------------------------------------------------------------------------
-bool DsfLogger::init(char const* filePath) {
+bool DsfLogger::init(char const* filePath, bool ned) {
     outFile_.open(filePath);
+    orientationNed_ = ned;
     return (outFile_) ? true : false;
 }
 
@@ -86,7 +87,12 @@ void DsfLogger::logMessage(char const* msg) {
 void DsfLogger::logHeader(uint8_t sensorId, char const* fieldNames, char const* name) {
     outFile_ << "+" << static_cast<int32_t>(sensorId) << " TIME{s},SAMPLE_ID[x]," << fieldNames
              << "\n";
-    outFile_ << "!" << static_cast<int32_t>(sensorId) << " coordinate_system=\"NED\"\n";
+    outFile_ << "!" << static_cast<int32_t>(sensorId);
+    if (orientationNed_) {
+        outFile_ << " coordinate_system=\"NED\"\n";
+    } else {
+        outFile_ << " coordinate_system=\"ENU\"\n";
+    }
     outFile_ << "!" << static_cast<int32_t>(sensorId) << " name=\"" << name << "\"\n";
 }
 
@@ -182,10 +188,17 @@ void DsfLogger::logSensorValue(sh2_SensorValue_t* pValue, double currTime) {
             outFile_ << std::fixed << std::setprecision(9) << currTime << ",";
             outFile_.unsetf(std::ios_base::floatfield);
             outFile_ << extender.extend(pValue->sequence) << ",";
-            outFile_ << pValue->un.rotationVector.real << ",";
-            outFile_ << pValue->un.rotationVector.j << ","; // Convert ENU -> NED
-            outFile_ << pValue->un.rotationVector.i << ",";
-            outFile_ << -pValue->un.rotationVector.k << ",";
+            if (orientationNed_) {
+                outFile_ << pValue->un.rotationVector.real << ",";
+                outFile_ << pValue->un.rotationVector.j << ","; // Convert ENU -> NED
+                outFile_ << pValue->un.rotationVector.i << ",";
+                outFile_ << -pValue->un.rotationVector.k << ",";
+            } else {
+                outFile_ << pValue->un.rotationVector.real << ",";
+                outFile_ << pValue->un.rotationVector.i << ",";
+                outFile_ << pValue->un.rotationVector.j << ",";
+                outFile_ << pValue->un.rotationVector.k << ",";
+            }
             outFile_ << (pValue->un.rotationVector.accuracy * 180.0 / PI) << ",";
             outFile_ << static_cast<uint32_t>(pValue->status) << "\n";
             break;
@@ -201,13 +214,24 @@ void DsfLogger::logSensorValue(sh2_SensorValue_t* pValue, double currTime) {
             outFile_ << std::fixed << std::setprecision(9) << currTime << ",";
             outFile_.unsetf(std::ios_base::floatfield);
             outFile_ << extender.extend(pValue->sequence) << ",";
-            outFile_ << pValue->un.gyroIntegratedRV.real << ",";
-            outFile_ << pValue->un.gyroIntegratedRV.j << ","; // Convert ENU -> NED
-            outFile_ << pValue->un.gyroIntegratedRV.i << ",";
-            outFile_ << -pValue->un.gyroIntegratedRV.k << ",";
-            outFile_ << pValue->un.gyroIntegratedRV.angVelY << ",";
-            outFile_ << pValue->un.gyroIntegratedRV.angVelX << ",";
-            outFile_ << -pValue->un.gyroIntegratedRV.angVelZ << "\n";
+            if (orientationNed_) {
+                outFile_ << pValue->un.gyroIntegratedRV.real << ",";
+                outFile_ << pValue->un.gyroIntegratedRV.j << ","; // Convert ENU -> NED
+                outFile_ << pValue->un.gyroIntegratedRV.i << ",";
+                outFile_ << -pValue->un.gyroIntegratedRV.k << ",";
+                outFile_ << pValue->un.gyroIntegratedRV.angVelY << ",";
+                outFile_ << pValue->un.gyroIntegratedRV.angVelX << ",";
+                outFile_ << -pValue->un.gyroIntegratedRV.angVelZ;
+            } else {
+                outFile_ << pValue->un.gyroIntegratedRV.real << ",";
+                outFile_ << pValue->un.gyroIntegratedRV.i << ",";
+                outFile_ << pValue->un.gyroIntegratedRV.j << ",";
+                outFile_ << pValue->un.gyroIntegratedRV.k << ",";
+                outFile_ << pValue->un.gyroIntegratedRV.angVelX << ",";
+                outFile_ << pValue->un.gyroIntegratedRV.angVelY << ",";
+                outFile_ << pValue->un.gyroIntegratedRV.angVelZ;
+            }
+            outFile_ << "\n";
             break;
         }
         case SH2_GAME_ROTATION_VECTOR: {
@@ -219,10 +243,18 @@ void DsfLogger::logSensorValue(sh2_SensorValue_t* pValue, double currTime) {
             outFile_ << std::fixed << std::setprecision(9) << currTime << ",";
             outFile_.unsetf(std::ios_base::floatfield);
             outFile_ << extender.extend(pValue->sequence) << ",";
-            outFile_ << pValue->un.gameRotationVector.real << ",";
-            outFile_ << pValue->un.gameRotationVector.j << ","; // Convert ENU -> NED
-            outFile_ << pValue->un.gameRotationVector.i << ",";
-            outFile_ << -pValue->un.gameRotationVector.k << "\n";
+            if (orientationNed_) {
+                outFile_ << pValue->un.gameRotationVector.real << ",";
+                outFile_ << pValue->un.gameRotationVector.j << ","; // Convert ENU -> NED
+                outFile_ << pValue->un.gameRotationVector.i << ",";
+                outFile_ << -pValue->un.gameRotationVector.k;
+            } else {
+                outFile_ << pValue->un.gameRotationVector.real << ",";
+                outFile_ << pValue->un.gameRotationVector.i << ",";
+                outFile_ << pValue->un.gameRotationVector.j << ",";
+                outFile_ << pValue->un.gameRotationVector.k;
+            }
+            outFile_ << "\n";
             break;
         }
         case SH2_GEOMAGNETIC_ROTATION_VECTOR: {
@@ -236,10 +268,17 @@ void DsfLogger::logSensorValue(sh2_SensorValue_t* pValue, double currTime) {
             outFile_ << std::fixed << std::setprecision(9) << currTime << ",";
             outFile_.unsetf(std::ios_base::floatfield);
             outFile_ << extender.extend(pValue->sequence) << ",";
-            outFile_ << pValue->un.geoMagRotationVector.real << ",";
-            outFile_ << pValue->un.geoMagRotationVector.j << ","; // Convert ENU -> NED
-            outFile_ << pValue->un.geoMagRotationVector.i << ",";
-            outFile_ << -pValue->un.geoMagRotationVector.k << ",";
+            if (orientationNed_) {
+                outFile_ << pValue->un.geoMagRotationVector.real << ",";
+                outFile_ << pValue->un.geoMagRotationVector.j << ","; // Convert ENU -> NED
+                outFile_ << pValue->un.geoMagRotationVector.i << ",";
+                outFile_ << -pValue->un.geoMagRotationVector.k << ",";
+            } else {
+                outFile_ << pValue->un.geoMagRotationVector.real << ",";
+                outFile_ << pValue->un.geoMagRotationVector.i << ",";
+                outFile_ << pValue->un.geoMagRotationVector.j << ",";
+                outFile_ << pValue->un.geoMagRotationVector.k << ",";
+            }
             outFile_ << (pValue->un.geoMagRotationVector.accuracy * 180.0 / PI) << ",";
             outFile_ << static_cast<uint32_t>(pValue->status) << "\n";
             break;
@@ -297,9 +336,15 @@ void DsfLogger::logSensorValue(sh2_SensorValue_t* pValue, double currTime) {
             outFile_ << std::fixed << std::setprecision(9) << currTime << ",";
             outFile_.unsetf(std::ios_base::floatfield);
             outFile_ << extender.extend(pValue->sequence) << ",";
-            outFile_ << pValue->un.accelerometer.y << ","; // ENU -> NED
-            outFile_ << pValue->un.accelerometer.x << ",";
-            outFile_ << -pValue->un.accelerometer.z << ",";
+            if (orientationNed_) {
+                outFile_ << pValue->un.accelerometer.y << ","; // ENU -> NED
+                outFile_ << pValue->un.accelerometer.x << ",";
+                outFile_ << -pValue->un.accelerometer.z << ",";
+            } else {
+                outFile_ << pValue->un.accelerometer.x << ",";
+                outFile_ << pValue->un.accelerometer.y << ",";
+                outFile_ << pValue->un.accelerometer.z << ",";
+            }
             outFile_ << static_cast<uint32_t>(pValue->status) << "\n";
             break;
         }
@@ -312,12 +357,22 @@ void DsfLogger::logSensorValue(sh2_SensorValue_t* pValue, double currTime) {
             outFile_ << std::fixed << std::setprecision(9) << currTime << ",";
             outFile_.unsetf(std::ios_base::floatfield);
             outFile_ << extender.extend(pValue->sequence) << ",";
-            outFile_ << pValue->un.gyroscopeUncal.y << ","; // ENU -> NED
-            outFile_ << pValue->un.gyroscopeUncal.x << ",";
-            outFile_ << -pValue->un.gyroscopeUncal.z << ",";
-            outFile_ << pValue->un.gyroscopeUncal.biasY << ","; // ENU -> NED
-            outFile_ << pValue->un.gyroscopeUncal.biasX << ",";
-            outFile_ << -pValue->un.gyroscopeUncal.biasZ << "\n";
+            if (orientationNed_) {
+                outFile_ << pValue->un.gyroscopeUncal.y << ","; // ENU -> NED
+                outFile_ << pValue->un.gyroscopeUncal.x << ",";
+                outFile_ << -pValue->un.gyroscopeUncal.z << ",";
+                outFile_ << pValue->un.gyroscopeUncal.biasY << ","; // ENU -> NED
+                outFile_ << pValue->un.gyroscopeUncal.biasX << ",";
+                outFile_ << -pValue->un.gyroscopeUncal.biasZ;
+            } else {
+                outFile_ << pValue->un.gyroscopeUncal.x << ",";
+                outFile_ << pValue->un.gyroscopeUncal.y << ",";
+                outFile_ << pValue->un.gyroscopeUncal.z << ",";
+                outFile_ << pValue->un.gyroscopeUncal.biasX << ",";
+                outFile_ << pValue->un.gyroscopeUncal.biasY << ",";
+                outFile_ << pValue->un.gyroscopeUncal.biasZ;
+            }
+            outFile_ << "\n";
             break;
         }
         case SH2_GYROSCOPE_CALIBRATED: {
@@ -329,9 +384,16 @@ void DsfLogger::logSensorValue(sh2_SensorValue_t* pValue, double currTime) {
             outFile_ << std::fixed << std::setprecision(9) << currTime << ",";
             outFile_.unsetf(std::ios_base::floatfield);
             outFile_ << extender.extend(pValue->sequence) << ",";
-            outFile_ << pValue->un.gyroscope.y << ","; // ENU -> NED
-            outFile_ << pValue->un.gyroscope.x << ",";
-            outFile_ << -pValue->un.gyroscope.z << "\n";
+            if (orientationNed_) {
+                outFile_ << pValue->un.gyroscope.y << ","; // ENU -> NED
+                outFile_ << pValue->un.gyroscope.x << ",";
+                outFile_ << -pValue->un.gyroscope.z;
+            } else {
+                outFile_ << pValue->un.gyroscope.x << ",";
+                outFile_ << pValue->un.gyroscope.y << ",";
+                outFile_ << pValue->un.gyroscope.z;
+            }
+            outFile_ << "\n";
             break;
         }
         case SH2_MAGNETIC_FIELD_CALIBRATED: {
@@ -343,9 +405,15 @@ void DsfLogger::logSensorValue(sh2_SensorValue_t* pValue, double currTime) {
             outFile_ << std::fixed << std::setprecision(9) << currTime << ",";
             outFile_.unsetf(std::ios_base::floatfield);
             outFile_ << extender.extend(pValue->sequence) << ",";
-            outFile_ << pValue->un.magneticField.y << ","; // ENU -> NED
-            outFile_ << pValue->un.magneticField.x << ",";
-            outFile_ << -pValue->un.magneticField.z << ",";
+            if (orientationNed_) {
+                outFile_ << pValue->un.magneticField.y << ","; // ENU -> NED
+                outFile_ << pValue->un.magneticField.x << ",";
+                outFile_ << -pValue->un.magneticField.z << ",";
+            } else {
+                outFile_ << pValue->un.magneticField.x << ",";
+                outFile_ << pValue->un.magneticField.y << ",";
+                outFile_ << pValue->un.magneticField.z << ",";
+            }
             outFile_ << static_cast<uint32_t>(pValue->status) << "\n";
             break;
         }
@@ -360,12 +428,21 @@ void DsfLogger::logSensorValue(sh2_SensorValue_t* pValue, double currTime) {
             outFile_ << std::fixed << std::setprecision(9) << currTime << ",";
             outFile_.unsetf(std::ios_base::floatfield);
             outFile_ << extender.extend(pValue->sequence) << ",";
-            outFile_ << pValue->un.magneticFieldUncal.y << ","; // ENU -> NED
-            outFile_ << pValue->un.magneticFieldUncal.x << ",";
-            outFile_ << -pValue->un.magneticFieldUncal.z << ",";
-            outFile_ << pValue->un.magneticFieldUncal.biasY << ","; // ENU -> NED
-            outFile_ << pValue->un.magneticFieldUncal.biasX << ",";
-            outFile_ << -pValue->un.magneticFieldUncal.biasZ << ",";
+            if (orientationNed_) {
+                outFile_ << pValue->un.magneticFieldUncal.y << ","; // ENU -> NED
+                outFile_ << pValue->un.magneticFieldUncal.x << ",";
+                outFile_ << -pValue->un.magneticFieldUncal.z << ",";
+                outFile_ << pValue->un.magneticFieldUncal.biasY << ","; // ENU -> NED
+                outFile_ << pValue->un.magneticFieldUncal.biasX << ",";
+                outFile_ << -pValue->un.magneticFieldUncal.biasZ << ",";
+            } else {
+                outFile_ << pValue->un.magneticFieldUncal.x << ",";
+                outFile_ << pValue->un.magneticFieldUncal.y << ",";
+                outFile_ << pValue->un.magneticFieldUncal.z << ",";
+                outFile_ << pValue->un.magneticFieldUncal.biasX << ",";
+                outFile_ << pValue->un.magneticFieldUncal.biasY << ",";
+                outFile_ << pValue->un.magneticFieldUncal.biasZ << ",";
+            }
             outFile_ << static_cast<uint32_t>(pValue->status) << "\n";
             break;
         }

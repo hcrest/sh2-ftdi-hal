@@ -34,7 +34,7 @@ class DsfLogger {
 public:
     DsfLogger(){};
 
-    bool init(char const* filePath);
+    bool init(char const* filePath, bool ned);
     void finish();
 
     void logMessage(char const* msg);
@@ -51,6 +51,7 @@ private:
     double const PI = 3.1415926535897932384626433832795;
 
     std::ofstream outFile_;
+    bool orientationNed_;
 };
 
 #endif // DSF_LOGGER_H
