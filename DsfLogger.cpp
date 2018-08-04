@@ -84,14 +84,16 @@ void DsfLogger::logMessage(char const* msg) {
 // -------------------------------------------------------------------------------------------------
 // DsfLogger::logHeader
 // -------------------------------------------------------------------------------------------------
-void DsfLogger::logHeader(uint8_t sensorId, char const* fieldNames, char const* name) {
+void DsfLogger::logHeader(uint8_t sensorId, char const* fieldNames, char const* name, bool orientation=true) {
     outFile_ << "+" << static_cast<int32_t>(sensorId) << " TIME{s},SAMPLE_ID[x]," << fieldNames
              << "\n";
-    outFile_ << "!" << static_cast<int32_t>(sensorId);
-    if (orientationNed_) {
-        outFile_ << " coordinate_system=\"NED\"\n";
-    } else {
-        outFile_ << " coordinate_system=\"ENU\"\n";
+    if (orientation) {
+        outFile_ << "!" << static_cast<int32_t>(sensorId);
+        if (orientationNed_) {
+            outFile_ << " coordinate_system=\"NED\"\n";
+        } else {
+            outFile_ << " coordinate_system=\"ENU\"\n";
+        }
     }
     outFile_ << "!" << static_cast<int32_t>(sensorId) << " name=\"" << name << "\"\n";
 }
@@ -177,6 +179,44 @@ void DsfLogger::logSensorValue(sh2_SensorValue_t* pValue, double currTime) {
     uint32_t id = pValue->sensorId;
 
     switch (id) {
+
+        case SH2_PERSONAL_ACTIVITY_CLASSIFIER: {
+            static SampleIdExtender extender;
+            if (extender.isEmpty()) {
+                logHeader(id,
+                    "MOST_LIKELY_STATE[x]{state},CONFIDENCE[uvbfstwrax]{state}",
+                    "PersonalActivityClassifier", false);
+            }
+            // fleung
+            outFile_ << "." << id << " ";
+            outFile_ << std::fixed << std::setprecision(9) << currTime << ",";
+            outFile_.unsetf(std::ios_base::floatfield);
+            outFile_ << extender.extend(pValue->sequence) << ",";
+
+            outFile_ << static_cast<uint32_t>(pValue->un.personalActivityClassifier.mostLikelyState) << ",";
+            for (int i = 0; i < 10; i++) {
+                outFile_ << static_cast<uint32_t>(pValue->un.personalActivityClassifier.confidence[i]) << ",";
+            }
+            outFile_ << static_cast<uint32_t>(pValue->status) << "\n";
+            break;
+        }
+
+        case SH2_STEP_DETECTOR: {
+            static SampleIdExtender extender;
+            if (extender.isEmpty()) {
+                logHeader(id,
+                    "STEP_DETECTOR_LATENCY[x]{us}",
+                    "StepDetector", false);
+            }
+            outFile_ << "." << id << " ";
+            outFile_ << std::fixed << std::setprecision(9) << currTime << ",";
+            outFile_.unsetf(std::ios_base::floatfield);
+            outFile_ << extender.extend(pValue->sequence) << ",";
+            outFile_ << pValue->un.stepDetector.latency << ",";
+            outFile_ << static_cast<uint32_t>(pValue->status) << "\n";
+            break;
+        }
+
         case SH2_ROTATION_VECTOR: {
             static SampleIdExtender extender;
             if (extender.isEmpty()) {

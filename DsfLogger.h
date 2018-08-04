@@ -44,7 +44,7 @@ public:
     void logProductIds(sh2_ProductIds_t ids);
     void logFrsRecord(char const* name, uint32_t* buffer, uint16_t words);
 
-    void logHeader(uint8_t sensorId, char const* fieldNames, char const* name);
+    void logHeader(uint8_t sensorId, char const* fieldNames, char const* name, bool orientation);
     void logSensorValue(sh2_SensorValue_t* pEvent, double currTime);
 
 private:
