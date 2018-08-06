@@ -80,9 +80,8 @@ The SensorHub device is connected to /dev/ttyUSB2.
 sh2_ftdi_logger.exe out_2.dsf --deviceNumber=2 --raw --mode=6ag
 ```
 
-Run DSF logger in 'batch' mode to enable the GameRV sensors along with the Activity Classifer and the Step Detector
 
-Create a batch file called 'sensorList.lst'. List out the SH2 Sensor ID of the required sensors; one sensor per line.
+Run DSF logger in 'batch' mode to enable the GameRV sensors along with the Activity Classifier and the Step Detector. Create a batch file called 'sensorList.lst'. List out the SH2 Sensor ID of the required sensors; one sensor per line.
 ```
 8
 24
