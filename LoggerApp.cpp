@@ -20,15 +20,7 @@
 #include "FtdiHal.h"
 #include "TimerService.h"
 
-extern "C" {
-#include "sh2.h"
-#include "sh2_SensorValue.h"
-#include "sh2_err.h"
-#include "sh2_hal.h"
-}
-
 #include "math.h"
-
 #include <string.h>
 #include <iomanip>
 #include <iostream>
@@ -296,29 +288,30 @@ int LoggerApp::init(appConfig_s* appConfig, TimerSrv* timer, FtdiHal* ftdiHal, D
     }
 
     // Enable Sensors
+    uint32_t reportInterval_us;
+    reportInterval_us = static_cast<uint32_t>((1e6 / appConfig->rate) + 0.5);
+
     std::cout << "INFO: Enable Sensors\n";
     sh2_SensorConfig_t config;
-    memset(&config, 0, sizeof(config));
-    config.reportInterval_us = static_cast<uint32_t>((1e6 / appConfig->rate) + 0.5);
     for (SensorList_t::iterator it = sensorsToEnable_.begin(); it != sensorsToEnable_.end(); ++it) {
+        GetSensorConfiguration(*it, &config);
+        config.reportInterval_us = reportInterval_us;
         std::cout << "INFO: Sensor ID : " << *it << "\n";
         sh2_setSensorConfig(*it, &config);
     }
     
     // Enable Activity Classify 
     if (appConfig->pac) {
-        memset(&config, 0, sizeof(config));
-        config.reportInterval_us = static_cast<uint32_t>((1e6 / appConfig->rate) + 0.5);
-        config.sensorSpecific = 511;
+        GetSensorConfiguration(SH2_PERSONAL_ACTIVITY_CLASSIFIER, &config);
+        config.reportInterval_us = reportInterval_us;
         std::cout << "INFO: Sensor ID : " << SH2_PERSONAL_ACTIVITY_CLASSIFIER << "\n";
         sh2_setSensorConfig(SH2_PERSONAL_ACTIVITY_CLASSIFIER, &config);
     }
 
     // Enable Step Detector
     if (appConfig->step) {
-        memset(&config, 0, sizeof(config));
-        config.reportInterval_us = static_cast<uint32_t>((1e6 / appConfig->rate) + 0.5);
-        config.changeSensitivityEnabled = true;
+        GetSensorConfiguration(SH2_STEP_DETECTOR, &config);
+        config.reportInterval_us = reportInterval_us;
         std::cout << "INFO: Sensor ID : " << SH2_STEP_DETECTOR << "\n";
         sh2_setSensorConfig(SH2_STEP_DETECTOR, &config);
     }
@@ -618,6 +611,21 @@ void LoggerApp::UpdateSensorList(SensorList_t* sensorsToEnable, LoggerApp::appCo
             break;
     }
 }
+
+// -------------------------------------------------------------------------------------------------
+// LoggerApp::GetSensorConfiguration
+// -------------------------------------------------------------------------------------------------
+void LoggerApp::GetSensorConfiguration(sh2_SensorId_t sensorId, sh2_SensorConfig_t* pConfig) {
+    memset(pConfig, 0, sizeof(sh2_SensorConfig_t));
+
+    if (sensorId == SH2_PERSONAL_ACTIVITY_CLASSIFIER) {
+        pConfig->sensorSpecific = 511;
+
+    } else if (sensorId == SH2_STEP_DETECTOR) {
+        pConfig->changeSensitivityEnabled = true;
+    }
+}
+
 
 // -------------------------------------------------------------------------------------------------
 // LoggerApp::LogFrs

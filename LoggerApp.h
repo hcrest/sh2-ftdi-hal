@@ -18,6 +18,13 @@
 #ifndef LOGGER_APP_H
 #define LOGGER_APP_H
 
+extern "C" {
+#include "sh2.h"
+#include "sh2_SensorValue.h"
+#include "sh2_err.h"
+#include "sh2_hal.h"
+}
+
 #include <list>
 #include <stdint.h>
 
@@ -95,6 +102,8 @@ private:
     bool WaitForResetComplete(int loops);
     void ProcessConfigFile(SensorList_t* sensorsToEnable, LoggerApp::appConfig_s* pConfig);
     void UpdateSensorList(SensorList_t* sensorsToEnable, LoggerApp::appConfig_s* pConfig);
+    void GetSensorConfiguration(sh2_SensorId_t sensorId, sh2_SensorConfig_t* pConfig);
+
     int LogFrs(uint16_t recordId, char const* name);
     void LogAllFrsBNO080();
 };
