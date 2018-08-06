@@ -38,13 +38,10 @@ public:
     void finish();
 
     void logMessage(char const* msg);
-
     void logAsyncEvent(sh2_AsyncEvent_t* pEvent, double currTime);
 
     void logProductIds(sh2_ProductIds_t ids);
     void logFrsRecord(char const* name, uint32_t* buffer, uint16_t words);
-
-    void logHeader(uint8_t sensorId, char const* fieldNames, char const* name, bool orientation);
     void logSensorValue(sh2_SensorValue_t* pEvent, double currTime);
 
 private:
@@ -52,6 +49,8 @@ private:
 
     std::ofstream outFile_;
     bool orientationNed_;
+
+    void LogHeader(uint8_t sensorId, char const* fieldNames, char const* name, bool orientation = true);
 };
 
 #endif // DSF_LOGGER_H

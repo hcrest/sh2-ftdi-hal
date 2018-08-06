@@ -82,23 +82,6 @@ void DsfLogger::logMessage(char const* msg) {
 }
 
 // -------------------------------------------------------------------------------------------------
-// DsfLogger::logHeader
-// -------------------------------------------------------------------------------------------------
-void DsfLogger::logHeader(uint8_t sensorId, char const* fieldNames, char const* name, bool orientation=true) {
-    outFile_ << "+" << static_cast<int32_t>(sensorId) << " TIME{s},SAMPLE_ID[x]," << fieldNames
-             << "\n";
-    if (orientation) {
-        outFile_ << "!" << static_cast<int32_t>(sensorId);
-        if (orientationNed_) {
-            outFile_ << " coordinate_system=\"NED\"\n";
-        } else {
-            outFile_ << " coordinate_system=\"ENU\"\n";
-        }
-    }
-    outFile_ << "!" << static_cast<int32_t>(sensorId) << " name=\"" << name << "\"\n";
-}
-
-// -------------------------------------------------------------------------------------------------
 // DsfLogger::logAsyncEvent
 // -------------------------------------------------------------------------------------------------
 void DsfLogger::logAsyncEvent(sh2_AsyncEvent_t* pEvent, double currTime) {
@@ -183,7 +166,7 @@ void DsfLogger::logSensorValue(sh2_SensorValue_t* pValue, double currTime) {
         case SH2_PERSONAL_ACTIVITY_CLASSIFIER: {
             static SampleIdExtender extender;
             if (extender.isEmpty()) {
-                logHeader(id,
+                LogHeader(id,
                     "MOST_LIKELY_STATE[x]{state},CONFIDENCE[uvbfstwrax]{state}",
                     "PersonalActivityClassifier", false);
             }
@@ -204,7 +187,7 @@ void DsfLogger::logSensorValue(sh2_SensorValue_t* pValue, double currTime) {
         case SH2_STEP_DETECTOR: {
             static SampleIdExtender extender;
             if (extender.isEmpty()) {
-                logHeader(id,
+                LogHeader(id,
                     "STEP_DETECTOR_LATENCY[x]{us}",
                     "StepDetector", false);
             }
@@ -220,7 +203,7 @@ void DsfLogger::logSensorValue(sh2_SensorValue_t* pValue, double currTime) {
         case SH2_ROTATION_VECTOR: {
             static SampleIdExtender extender;
             if (extender.isEmpty()) {
-                logHeader(id,
+                LogHeader(id,
                           "ANG_POS_GLOBAL[wxyz]{quaternion},ANG_POS_ACCURACY[x]{deg},STATUS[x]",
                           "RotationVector");
             }
@@ -246,7 +229,7 @@ void DsfLogger::logSensorValue(sh2_SensorValue_t* pValue, double currTime) {
         case SH2_GYRO_INTEGRATED_RV: {
             static SampleIdExtender extender;
             if (extender.isEmpty()) {
-                logHeader(id,
+                LogHeader(id,
                           "ANG_POS_GLOBAL[wxyz]{quaternion},ANG_VEL[xyz]{rad/s}",
                           "GyroIntegratedRV");
             }
@@ -277,7 +260,7 @@ void DsfLogger::logSensorValue(sh2_SensorValue_t* pValue, double currTime) {
         case SH2_GAME_ROTATION_VECTOR: {
             static SampleIdExtender extender;
             if (extender.isEmpty()) {
-                logHeader(id, "ANG_POS_GLOBAL[wxyz]{quaternion}", "GameRotationVector");
+                LogHeader(id, "ANG_POS_GLOBAL[wxyz]{quaternion}", "GameRotationVector");
             }
             outFile_ << "." << id << " ";
             outFile_ << std::fixed << std::setprecision(9) << currTime << ",";
@@ -300,7 +283,7 @@ void DsfLogger::logSensorValue(sh2_SensorValue_t* pValue, double currTime) {
         case SH2_GEOMAGNETIC_ROTATION_VECTOR: {
             static SampleIdExtender extender;
             if (extender.isEmpty()) {
-                logHeader(id,
+                LogHeader(id,
                           "ANG_POS_GLOBAL[wxyz]{quaternion},ANG_POS_ACCURACY[x]{deg},STATUS[x]",
                           "GeomagneticRotationVector");
             }
@@ -327,7 +310,7 @@ void DsfLogger::logSensorValue(sh2_SensorValue_t* pValue, double currTime) {
         case SH2_RAW_ACCELEROMETER: {
             static SampleIdExtender extender;
             if (extender.isEmpty()) {
-                logHeader(id, "LIN_ACC_GRAVITY[xyz]{ADC}", "RawAccelerometer");
+                LogHeader(id, "LIN_ACC_GRAVITY[xyz]{ADC}", "RawAccelerometer");
             }
             outFile_ << "." << id << " ";
             outFile_ << std::fixed << std::setprecision(9) << currTime << ",";
@@ -341,7 +324,7 @@ void DsfLogger::logSensorValue(sh2_SensorValue_t* pValue, double currTime) {
         case SH2_RAW_GYROSCOPE: {
             static SampleIdExtender extender;
             if (extender.isEmpty()) {
-                logHeader(id, "ANG_VEL[xyz]{ADC},TEMPERATURE[x]{ADC}", "RawGyroscope");
+                LogHeader(id, "ANG_VEL[xyz]{ADC},TEMPERATURE[x]{ADC}", "RawGyroscope");
             }
             outFile_ << "." << id << " ";
             outFile_ << std::fixed << std::setprecision(9) << currTime << ",";
@@ -356,7 +339,7 @@ void DsfLogger::logSensorValue(sh2_SensorValue_t* pValue, double currTime) {
         case SH2_RAW_MAGNETOMETER: {
             static SampleIdExtender extender;
             if (extender.isEmpty()) {
-                logHeader(id, "MAG[xyz]{ADC}", "RawMagnetometer");
+                LogHeader(id, "MAG[xyz]{ADC}", "RawMagnetometer");
             }
             outFile_ << "." << id << " ";
             outFile_ << std::fixed << std::setprecision(9) << currTime << ",";
@@ -370,7 +353,7 @@ void DsfLogger::logSensorValue(sh2_SensorValue_t* pValue, double currTime) {
         case SH2_ACCELEROMETER: {
             static SampleIdExtender extender;
             if (extender.isEmpty()) {
-                logHeader(id, "LIN_ACC_GRAVITY[xyz]{m/s^2},STATUS[x]", "Accelerometer");
+                LogHeader(id, "LIN_ACC_GRAVITY[xyz]{m/s^2},STATUS[x]", "Accelerometer");
             }
             outFile_ << "." << id << " ";
             outFile_ << std::fixed << std::setprecision(9) << currTime << ",";
@@ -391,7 +374,7 @@ void DsfLogger::logSensorValue(sh2_SensorValue_t* pValue, double currTime) {
         case SH2_GYROSCOPE_UNCALIBRATED: {
             static SampleIdExtender extender;
             if (extender.isEmpty()) {
-                logHeader(id, "ANG_VEL[xyz]{rad/s},BIAS[xyz]{rad/s}", "UncalibratedGyroscope");
+                LogHeader(id, "ANG_VEL[xyz]{rad/s},BIAS[xyz]{rad/s}", "UncalibratedGyroscope");
             }
             outFile_ << "." << id << " ";
             outFile_ << std::fixed << std::setprecision(9) << currTime << ",";
@@ -418,7 +401,7 @@ void DsfLogger::logSensorValue(sh2_SensorValue_t* pValue, double currTime) {
         case SH2_GYROSCOPE_CALIBRATED: {
             static SampleIdExtender extender;
             if (extender.isEmpty()) {
-                logHeader(id, "ANG_VEL[xyz]{rad/s}", "Gyroscope");
+                LogHeader(id, "ANG_VEL[xyz]{rad/s}", "Gyroscope");
             }
             outFile_ << "." << id << " ";
             outFile_ << std::fixed << std::setprecision(9) << currTime << ",";
@@ -439,7 +422,7 @@ void DsfLogger::logSensorValue(sh2_SensorValue_t* pValue, double currTime) {
         case SH2_MAGNETIC_FIELD_CALIBRATED: {
             static SampleIdExtender extender;
             if (extender.isEmpty()) {
-                logHeader(id, "MAG[xyz]{m/s^2},STATUS[x]", "MagneticField");
+                LogHeader(id, "MAG[xyz]{m/s^2},STATUS[x]", "MagneticField");
             }
             outFile_ << "." << id << " ";
             outFile_ << std::fixed << std::setprecision(9) << currTime << ",";
@@ -460,7 +443,7 @@ void DsfLogger::logSensorValue(sh2_SensorValue_t* pValue, double currTime) {
         case SH2_MAGNETIC_FIELD_UNCALIBRATED: {
             static SampleIdExtender extender;
             if (extender.isEmpty()) {
-                logHeader(id,
+                LogHeader(id,
                           "MAG_UNCAL[xyz]{m/s^2},MAG_BAIS[xyz]{m/s^2},STATUS[x]",
                           "UncalibratedMagField");
             }
@@ -490,4 +473,26 @@ void DsfLogger::logSensorValue(sh2_SensorValue_t* pValue, double currTime) {
         default:
             break;
     }
+}
+
+
+// =================================================================================================
+// PRIVATE FUNCTIONS
+// =================================================================================================
+// -------------------------------------------------------------------------------------------------
+// DsfLogger::LogHeader
+// -------------------------------------------------------------------------------------------------
+void DsfLogger::LogHeader(uint8_t sensorId, char const* fieldNames, char const* name, bool orientation) {
+    outFile_ << "+" << static_cast<int32_t>(sensorId) << " TIME{s},SAMPLE_ID[x]," << fieldNames
+        << "\n";
+    if (orientation) {
+        outFile_ << "!" << static_cast<int32_t>(sensorId);
+        if (orientationNed_) {
+            outFile_ << " coordinate_system=\"NED\"\n";
+        }
+        else {
+            outFile_ << " coordinate_system=\"ENU\"\n";
+        }
+    }
+    outFile_ << "!" << static_cast<int32_t>(sensorId) << " name=\"" << name << "\"\n";
 }
