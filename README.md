@@ -51,11 +51,13 @@ Usage: sh2_ftdi_logger.exe <out.dsf> [--deviceNumber=<id>] [--rate=<rate>] [--ra
    --calibrated         - include calibrated output sensors
    --uncalibrated       - include uncalibrated output sensors
    --mode=<mode>        - sensors types to log.  9agm, 6ag, 6am, 6gm, 3a, 3g, 3m or all.
+   --step               - include step detector.
+   --pac                - include activity classifier.
    --dcdAutoSave        - enable DCD auto saving.  No dcd save by default.
    --clearDcd           - clear DCD and reset upon startup.
    --calEnable=0x<mask> - cal enable mask.  Bits: Planar, A, G, M.  Default 0x8
    --orientation=<orientation> - system orientation. enu, ned. Default: ned
-   --batch              - get the list of sensors from sensorList.lst file
+   --batch              - get the list of sensors from sensorList.lst file. When enabled, the raw, calibrated, unclirated, mode, step and pac options are ignored. 
 ```
 
 The list of sensor reports generated for each mode and options.
