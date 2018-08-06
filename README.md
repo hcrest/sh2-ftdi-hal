@@ -57,7 +57,7 @@ Usage: sh2_ftdi_logger.exe <out.dsf> [--deviceNumber=<id>] [--rate=<rate>] [--ra
    --clearDcd           - clear DCD and reset upon startup.
    --calEnable=0x<mask> - cal enable mask.  Bits: Planar, A, G, M.  Default 0x8
    --orientation=<orientation> - system orientation. enu, ned. Default: ned
-   --batch              - get the list of sensors from sensorList.lst file. When enabled, the raw, calibrated, unclirated, mode, step and pac options are ignored. 
+   --batch              - get the list of sensors from sensorList.lst file. When enabled, the raw, calibrated, uncalibrated, mode, step and pac options are ignored. 
 ```
 
 The list of sensor reports generated for each mode and options.
