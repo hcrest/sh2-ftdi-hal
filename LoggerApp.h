@@ -58,6 +58,8 @@ public:
         bool outputCalibrated = false;
         bool outputUncalibrated = false;
         SensorMode sensorMode = SENSOR_MODE_9AGM;
+        bool step = false;
+        bool pac = false;
         bool dcdAutoSave = false;
         bool clearDcd = false;
         uint8_t calEnableMask = 0x8; // TODO review data type

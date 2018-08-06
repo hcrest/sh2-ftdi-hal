@@ -312,6 +312,24 @@ int LoggerApp::init(appConfig_s* appConfig, TimerSrv* timer, FtdiHal* ftdiHal, D
         std::cout << "INFO: Sensor ID : " << *it << "\n";
         sh2_setSensorConfig(*it, &config);
     }
+    
+    // Enable Activity Classify 
+    if (appConfig->pac) {
+        memset(&config, 0, sizeof(config));
+        config.reportInterval_us = static_cast<uint32_t>((1e6 / appConfig->rate) + 0.5);
+        config.sensorSpecific = 511;
+        std::cout << "INFO: Sensor ID : " << SH2_PERSONAL_ACTIVITY_CLASSIFIER << "\n";
+        sh2_setSensorConfig(SH2_PERSONAL_ACTIVITY_CLASSIFIER, &config);
+    }
+
+    // Enable Step Detector
+    if (appConfig->step) {
+        memset(&config, 0, sizeof(config));
+        config.reportInterval_us = static_cast<uint32_t>((1e6 / appConfig->rate) + 0.5);
+        config.changeSensitivityEnabled = true;
+        std::cout << "INFO: Sensor ID : " << SH2_STEP_DETECTOR << "\n";
+        sh2_setSensorConfig(SH2_STEP_DETECTOR, &config);
+    }
 
     firstReportReceived_ = false;
     state_ = State::Run;
