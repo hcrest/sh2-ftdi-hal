@@ -127,49 +127,49 @@ frsString_s bno080Frs_[] = {
 };
 
 char const* sensorName_[] = {
-    "SH2_RESERVED",                     // 0x00
-    "SH2_ACCELEROMETER",                // 0x01
-    "SH2_GYROSCOPE_CALIBRATED",         // 0x02
-    "SH2_MAGNETIC_FIELD_CALIBRATED",    // 0x03
-    "SH2_LINEAR_ACCELERATION",          // 0x04
-    "SH2_ROTATION_VECTOR",              // 0x05
-    "SH2_GRAVITY",                      // 0x06
-    "SH2_GYROSCOPE_UNCALIBRATED",       // 0x07
-    "SH2_GAME_ROTATION_VECTOR",         // 0x08
-    "SH2_GEOMAGNETIC_ROTATION_VECTOR",  // 0x09
-    "SH2_PRESSURE",                     // 0x0A
-    "SH2_AMBIENT_LIGHT",                // 0x0B
-    "SH2_HUMIDITY",                     // 0x0C
-    "SH2_PROXIMITY",                    // 0x0D
-    "SH2_TEMPERATURE",                  // 0x0E
-    "SH2_MAGNETIC_FIELD_UNCALIBRATED",  // 0x0F
-    "SH2_TAP_DETECTOR",                 // 0x10
-    "SH2_STEP_COUNTER",                 // 0x11
-    "SH2_SIGNIFICANT_MOTION",           // 0x12
-    "SH2_STABILITY_CLASSIFIER",         // 0x13
-    "SH2_RAW_ACCELEROMETER",            // 0x14
-    "SH2_RAW_GYROSCOPE",                // 0x15
-    "SH2_RAW_MAGNETOMETER",             // 0x16
-    "SH2_RESERVED",                     // 0x17
-    "SH2_STEP_DETECTOR",                // 0x18
-    "SH2_SHAKE_DETECTOR",               // 0x19
-    "SH2_FLIP_DETECTOR",                // 0x1A
-    "SH2_PICKUP_DETECTOR",              // 0x1B
-    "SH2_STABILITY_DETECTOR",           // 0x1C
-    "SH2_RESERVED",                     // 0x1D
-    "SH2_PERSONAL_ACTIVITY_CLASSIFIER", // 0x1E
-    "SH2_SLEEP_DETECTOR",               // 0x1F
-    "SH2_TILT_DETECTOR",                // 0x20
-    "SH2_POCKET_DETECTOR",              // 0x21
-    "SH2_CIRCLE_DETECTOR",              // 0x22
-    "SH2_HEART_RATE_MONITOR",           // 0x23
-    "SH2_RESERVED",                     // 0x24
-    "SH2_RESERVED",                     // 0x25
-    "SH2_RESERVED",                     // 0x26
-    "SH2_RESERVED",                     // 0x27
-    "SH2_ARVR_STABILIZED_RV",           // 0x28
-    "SH2_ARVR_STABILIZED_GRV",          // 0x29
-    "SH2_GYRO_INTEGRATED_RV",           // 0x2A
+    "Reserved",                     // 0x00
+    "Accelerometer",                // 0x01
+    "Gyroscope",                    // 0x02
+    "Magnetic Field",               // 0x03
+    "Linear Acceleration",          // 0x04
+    "Rotation Vector",              // 0x05
+    "Gravity",                      // 0x06
+    "Uncalibrated Gyroscope",       // 0x07
+    "Game Rotation Vector",         // 0x08
+    "Geomagnetic Rotation Vector",  // 0x09
+    "Pressure",                     // 0x0A
+    "Ambient Light",                // 0x0B
+    "Humidity",                     // 0x0C
+    "Proximity",                    // 0x0D
+    "Temperature",                  // 0x0E
+    "Uncalibrated MagneticField",   // 0x0F
+    "Tap Detector",                 // 0x10
+    "Step Counter",                 // 0x11
+    "Significant Motion",           // 0x12
+    "Stability Classifier",         // 0x13
+    "Raw Accelerometer",            // 0x14
+    "Raw Gyroscope",                // 0x15
+    "Raw Magnetometer",             // 0x16
+    "Reserved",                     // 0x17
+    "Step Detector",                // 0x18
+    "Shake Detector",               // 0x19
+    "Flip Detector",                // 0x1A
+    "Pickup Detector",              // 0x1B
+    "Stability Detector",           // 0x1C
+    "Reserved",                     // 0x1D
+    "Personal Activity Classifier", // 0x1E
+    "Sleep Detector",               // 0x1F
+    "Tilt Detector",                // 0x20
+    "Pocket Detector",              // 0x21
+    "Circle Detector",              // 0x22
+    "Heart Rate Monitor",           // 0x23
+    "Reserved",                     // 0x24
+    "Reserved",                     // 0x25
+    "Reserved",                     // 0x26
+    "Reserved",                     // 0x27
+    "ARVR Stabilized Rotation Vector",      // 0x28
+    "ARVR Stabilized GameRotation Vector",  // 0x29
+    "Gyro Rotation Vector",         // 0x2A
 };
 
 // =================================================================================================
