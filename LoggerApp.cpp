@@ -32,7 +32,6 @@ extern "C" {
 #include <string.h>
 #include <iomanip>
 #include <iostream>
-#include <list>
 
 
 // =================================================================================================
@@ -54,8 +53,6 @@ enum class State {
 // =================================================================================================
 // DATA TYPES
 // =================================================================================================
-typedef std::list<uint32_t> SensorList_t;
-
 struct frsString_s {
     uint16_t recordId;
     char const* name;
@@ -64,13 +61,6 @@ struct frsString_s {
 // =================================================================================================
 // LOCAL FUNCTION PROTOTYPES
 // =================================================================================================
-static bool WaitForResetComplete(int loops);
-static bool HasSampleTime(uint8_t sensorId);
-static void ProcessConfigFile(SensorList_t* sensorsToEnable, LoggerApp::appConfig_s* pConfig);
-static void UpdateSensorList(SensorList_t* sensorsToEnable, LoggerApp::appConfig_s* pConfig);
-static int LogFrs(uint16_t recordId, char const* name);
-static void LogAllFrsBNO080();
-
 static int Sh2HalOpen(sh2_Hal_t* self);
 static void Sh2HalClose(sh2_Hal_t* self);
 static int Sh2HalRead(sh2_Hal_t* self, uint8_t* pBuffer, unsigned len, uint32_t* t_us);
@@ -80,7 +70,6 @@ static uint32_t Sh2HalGetTimeUs(sh2_Hal_t* self);
 // =================================================================================================
 // LOCAL VARIABLES
 // =================================================================================================
-
 static TimerSrv* timer_;
 static DsfLogger* logger_;
 static FtdiHal* ftdiHal_;
@@ -93,10 +82,6 @@ static double startTime = 0;
 static double currTime = 0;
 static double lastSampleTime = 0;
 
-static uint64_t lastReportTime_us_;
-static uint64_t curReportTime_us_;
-
-static SensorList_t sensorsToEnable_;
 static uint64_t sensorEventsReceived_ = 0;
 
 static sh2_Hal_t sh2Hal_ = {
@@ -446,10 +431,14 @@ static uint32_t Sh2HalGetTimeUs(sh2_Hal_t* self) {
     return (uint32_t)timer_->getTimestamp_us();
 }
 
+
+// =================================================================================================
+// PRIVATE METHODS
+// =================================================================================================
 // -------------------------------------------------------------------------------------------------
-// WaitForResetComplete
+// LoggerApp::WaitForResetComplete
 // -------------------------------------------------------------------------------------------------
-static bool WaitForResetComplete(int loops) {
+bool LoggerApp::WaitForResetComplete(int loops) {
     std::cout << "INFO: Waiting for System Reset ";
 
     for (int resetTime = 0; state_ == State::Reset; ++resetTime) {
@@ -467,17 +456,9 @@ static bool WaitForResetComplete(int loops) {
 }
 
 // -------------------------------------------------------------------------------------------------
-// HasSampleTime
+// LoggerApp::ProcessConfigFile
 // -------------------------------------------------------------------------------------------------
-static bool HasSampleTime(uint8_t sensorId) {
-    return (sensorId == SH2_RAW_ACCELEROMETER) || (sensorId == SH2_RAW_GYROSCOPE) ||
-           (sensorId == SH2_RAW_MAGNETOMETER);
-}
-
-// -------------------------------------------------------------------------------------------------
-// ProcessConfigFile
-// -------------------------------------------------------------------------------------------------
-static void ProcessConfigFile(SensorList_t* sensorsToEnable, LoggerApp::appConfig_s* pConfig) {
+void LoggerApp::ProcessConfigFile(SensorList_t* sensorsToEnable, LoggerApp::appConfig_s* pConfig) {
     std::ifstream infile("sensorlist.cfg");
     if (infile.is_open()) {
         std::cout << "INFO: Extract Sensor list from sensorlist.cfg\n";
@@ -509,9 +490,9 @@ static void ProcessConfigFile(SensorList_t* sensorsToEnable, LoggerApp::appConfi
 }
 
 // -------------------------------------------------------------------------------------------------
-// UpdateSensorList
+// LoggerApp::UpdateSensorList
 // -------------------------------------------------------------------------------------------------
-static void UpdateSensorList(SensorList_t* sensorsToEnable, LoggerApp::appConfig_s* pConfig) {
+void LoggerApp::UpdateSensorList(SensorList_t* sensorsToEnable, LoggerApp::appConfig_s* pConfig) {
 
     if (pConfig->outputRaw) {
         useSampleTime = true;
@@ -639,9 +620,9 @@ static void UpdateSensorList(SensorList_t* sensorsToEnable, LoggerApp::appConfig
 }
 
 // -------------------------------------------------------------------------------------------------
-// LogFrs
+// LoggerApp::LogFrs
 // -------------------------------------------------------------------------------------------------
-int LogFrs(uint16_t recordId, char const* name) {
+int LoggerApp::LogFrs(uint16_t recordId, char const* name) {
     uint32_t buffer[1024];
     memset(buffer, 0xAA, sizeof(buffer));
     uint16_t words = sizeof(buffer) / 4;
@@ -656,9 +637,9 @@ int LogFrs(uint16_t recordId, char const* name) {
 }
 
 // -------------------------------------------------------------------------------------------------
-// LogAllFrsBNO080
+// LoggerApp::LogAllFrsBNO080
 // -------------------------------------------------------------------------------------------------
-static void LogAllFrsBNO080() {
+void LoggerApp::LogAllFrsBNO080() {
     if (LogFrs(STATIC_CALIBRATION_AGM, "scd") == 0) {
         logger_->logMessage("# No SCD present, logging nominal calibration as 'scd'.");
         LogFrs(NOMINAL_CALIBRATION, "scd");

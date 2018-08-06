@@ -18,6 +18,7 @@
 #ifndef LOGGER_APP_H
 #define LOGGER_APP_H
 
+#include <list>
 #include <stdint.h>
 
 // =================================================================================================
@@ -74,7 +75,28 @@ public:
     int finish();
 
 private:
+    // ---------------------------------------------------------------------------------------------
+    // DATA TYPE
+    // ---------------------------------------------------------------------------------------------
+    typedef std::list<uint32_t> SensorList_t;
+
+    // ---------------------------------------------------------------------------------------------
+    // VARIABLES
+    // ---------------------------------------------------------------------------------------------
     bool firstReportReceived_ = false;
+    uint64_t lastReportTime_us_;
+    uint64_t curReportTime_us_;
+
+    SensorList_t sensorsToEnable_;
+
+    // ---------------------------------------------------------------------------------------------
+    // PRIVATE METHODS
+    // ---------------------------------------------------------------------------------------------
+    bool WaitForResetComplete(int loops);
+    void ProcessConfigFile(SensorList_t* sensorsToEnable, LoggerApp::appConfig_s* pConfig);
+    void UpdateSensorList(SensorList_t* sensorsToEnable, LoggerApp::appConfig_s* pConfig);
+    int LogFrs(uint16_t recordId, char const* name);
+    void LogAllFrsBNO080();
 };
 
 #endif // LOGGER_APP_H
