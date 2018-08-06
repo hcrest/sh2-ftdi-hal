@@ -282,9 +282,17 @@ int LoggerApp::init(appConfig_s* appConfig, TimerSrv* timer, FtdiHal* ftdiHal, D
         ProcessConfigFile(&sensorsToEnable_, appConfig);
     }
 
-    // Update the list of enabled sensors based on the mode and options
+    // Update the list of enabled sensors based on the mode/step/pac options
     if (!appConfig->config) {
         UpdateSensorList(&sensorsToEnable_, appConfig);
+
+        if (appConfig->pac) {
+            sensorsToEnable_.push_back(SH2_PERSONAL_ACTIVITY_CLASSIFIER);
+        }
+
+        if (appConfig->step) {
+            sensorsToEnable_.push_back(SH2_STEP_DETECTOR);
+        }
     }
 
     // Enable Sensors
@@ -300,22 +308,6 @@ int LoggerApp::init(appConfig_s* appConfig, TimerSrv* timer, FtdiHal* ftdiHal, D
         sh2_setSensorConfig(*it, &config);
     }
     
-    // Enable Activity Classify 
-    if (appConfig->pac) {
-        GetSensorConfiguration(SH2_PERSONAL_ACTIVITY_CLASSIFIER, &config);
-        config.reportInterval_us = reportInterval_us;
-        std::cout << "INFO: Sensor ID : " << SH2_PERSONAL_ACTIVITY_CLASSIFIER << "\n";
-        sh2_setSensorConfig(SH2_PERSONAL_ACTIVITY_CLASSIFIER, &config);
-    }
-
-    // Enable Step Detector
-    if (appConfig->step) {
-        GetSensorConfiguration(SH2_STEP_DETECTOR, &config);
-        config.reportInterval_us = reportInterval_us;
-        std::cout << "INFO: Sensor ID : " << SH2_STEP_DETECTOR << "\n";
-        sh2_setSensorConfig(SH2_STEP_DETECTOR, &config);
-    }
-
     firstReportReceived_ = false;
     state_ = State::Run;
 
@@ -462,14 +454,7 @@ void LoggerApp::ProcessConfigFile(SensorList_t* sensorsToEnable, LoggerApp::appC
             sensorId = (sh2_SensorId_t)id;
             if (sensorId <= SH2_MAX_SENSOR_ID) {
                 std::cout << "INFO: (.cfg) Sensor ID " << id << " \n";
-
-                if (sensorId == SH2_PERSONAL_ACTIVITY_CLASSIFIER) {
-                    pConfig->pac = true;
-                } else if (sensorId == SH2_STEP_DETECTOR) {
-                    pConfig->step = true;
-                } else {
-                    sensorsToEnable_.push_back(sensorId);
-                }
+                sensorsToEnable_.push_back(sensorId);
             }
         }
         sensorsToEnable_.sort();
