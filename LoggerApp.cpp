@@ -66,6 +66,7 @@ struct frsString_s {
 // =================================================================================================
 static bool WaitForResetComplete(int loops);
 static bool HasSampleTime(uint8_t sensorId);
+static void ProcessConfigFile(SensorList_t* sensorsToEnable, LoggerApp::appConfig_s* pConfig);
 static void UpdateSensorList(SensorList_t* sensorsToEnable, LoggerApp::appConfig_s* pConfig);
 static int LogFrs(uint16_t recordId, char const* name);
 static void LogAllFrsBNO080();
@@ -298,11 +299,19 @@ int LoggerApp::init(appConfig_s* appConfig, TimerSrv* timer, FtdiHal* ftdiHal, D
     LogAllFrsBNO080();
 
     // Enable Sensors
-    std::cout << "INFO: Enable Sensors\n";
+
+    // Check if a config file is specified.
+    if (appConfig->config) {
+        ProcessConfigFile(&sensorsToEnable_, appConfig);
+    }
 
     // Update the list of enabled sensors based on the mode and options
-    UpdateSensorList(&sensorsToEnable_, appConfig);
+    if (!appConfig->config) {
+        UpdateSensorList(&sensorsToEnable_, appConfig);
+    }
+
     // Enable Sensors
+    std::cout << "INFO: Enable Sensors\n";
     sh2_SensorConfig_t config;
     memset(&config, 0, sizeof(config));
     config.reportInterval_us = static_cast<uint32_t>((1e6 / appConfig->rate) + 0.5);
@@ -463,6 +472,40 @@ static bool WaitForResetComplete(int loops) {
 static bool HasSampleTime(uint8_t sensorId) {
     return (sensorId == SH2_RAW_ACCELEROMETER) || (sensorId == SH2_RAW_GYROSCOPE) ||
            (sensorId == SH2_RAW_MAGNETOMETER);
+}
+
+// -------------------------------------------------------------------------------------------------
+// ProcessConfigFile
+// -------------------------------------------------------------------------------------------------
+static void ProcessConfigFile(SensorList_t* sensorsToEnable, LoggerApp::appConfig_s* pConfig) {
+    std::ifstream infile("sensorlist.cfg");
+    if (infile.is_open()) {
+        std::cout << "INFO: Extract Sensor list from sensorlist.cfg\n";
+
+        sh2_SensorId_t sensorId;
+        int id;
+        while (infile >> id) {
+            sensorId = (sh2_SensorId_t)id;
+            if (sensorId <= SH2_MAX_SENSOR_ID) {
+                std::cout << "INFO: (.cfg) Sensor ID " << id << " \n";
+
+                if (sensorId == SH2_PERSONAL_ACTIVITY_CLASSIFIER) {
+                    pConfig->pac = true;
+                } else if (sensorId == SH2_STEP_DETECTOR) {
+                    pConfig->step = true;
+                } else {
+                    sensorsToEnable_.push_back(sensorId);
+                }
+            }
+        }
+        sensorsToEnable_.sort();
+        sensorsToEnable_.unique();
+
+    } else {
+        pConfig->config = false;
+        std::cout << "WARNING: sensorList.cfg is NOT found.\n";
+    }
+    infile.close();
 }
 
 // -------------------------------------------------------------------------------------------------

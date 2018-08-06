@@ -75,7 +75,7 @@ void usage(const char* myname) {
     fprintf(stderr,
             "Usage: %s <out.dsf> [--deviceNumber=<id>] [--rate=<rate>] [--raw] [--calibrated] "
             "[--uncalibrated] [--mode=<9agm,6ag,6am,6gm,3a,3g,3m,all>] [--dcdAutoSave] [--calEnable=0x<mask>]"
-            "[--orientation=enu,ned]\n"
+            "[--orientation=enu,ned][--config]\n"
             "   out.dsf              - output dsf file\n"
             "   --deviceNumber=<id>  - which device to open.  0 for a single device.\n"
             "   --rate=<rate>        - requested sampling rate for all sensors.  Default: 100Hz\n"
@@ -89,6 +89,7 @@ void usage(const char* myname) {
             "   --clearDcd           - clear DCD and reset upon startup.\n"
             "   --calEnable=0x<mask> - cal enable mask.  Bits: Planar, A, G, M.  Default 0x8\n"
             "   --orientation=<orientation> - system orientation. enu, ned. Default: ned\n",
+            "   --config             - get the list of sensors from sensorList.cfg file \n",
             myname);
 }
 
@@ -161,6 +162,8 @@ int main(int argc, const char* argv[]) {
                 } else {
                     appConfig.orientationNed = true;
                 }
+            } else if (strcmp(arg, "--config") == 0) {
+                    appConfig.config = true;
             } else {
                 fprintf(stderr, "Unknown argument: %s\n", arg);
                 argError = true;
