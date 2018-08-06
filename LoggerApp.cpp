@@ -50,6 +50,11 @@ struct frsString_s {
     char const* name;
 };
 
+struct sensorSpec_s {
+    char const* name;
+    const sh2_SensorConfig_t* config;
+};
+
 // =================================================================================================
 // LOCAL FUNCTION PROTOTYPES
 // =================================================================================================
@@ -75,6 +80,27 @@ static double currTime = 0;
 static double lastSampleTime = 0;
 
 static uint64_t sensorEventsReceived_ = 0;
+
+// Sensors which requires special configuration
+static const sh2_SensorConfig_t DefaultConfigSpec_ = { false, false, false, false, 0, 0, 0, 0 };
+
+static const sh2_SensorConfig_t PacConfigSpec_ = { false, false, false, false, 0, 0, 0, 511 };
+static const sh2_SensorConfig_t StabilityClassifierConfigSpec_ = { true, true, false, false, 0, 0, 0, 0 };
+static const sh2_SensorConfig_t StepDetectorConfigSpec_ = { true, false, false, false, 0, 0, 0, 0 };
+static const sh2_SensorConfig_t PressureConfigSpec_ = { false, false, false, false, 0, 0, 0, 0 };
+static const sh2_SensorConfig_t AmbientLightConfigSpec_ = { true, true, false, false, (uint16_t)(0.1 * (2 ^ 6)), 0, 0, 0 };
+static const sh2_SensorConfig_t TemperatureConfigSpec_ = { true, true, false, false, (uint16_t)(0.1 * (2 ^ 7)), 0, 0, 0 };
+static const sh2_SensorConfig_t HumidityConfigSpec_ = { true, true, false, false, (uint16_t)(0.1 * (2 ^ 8)), 0, 0, 0 };
+static const sh2_SensorConfig_t ProximityConfigSpec_ = { true, true, true, true, (uint16_t)(1.0 * (2 ^ 4)), 0, 0, 0 };
+static const sh2_SensorConfig_t TapDetectorConfigSpec_ = { true, false, false, false, 0, 0, 0, 0 };
+static const sh2_SensorConfig_t ShakeDetectorConfigSpec_ = { true, false, true, true, 0, 0, 0, 0 };
+static const sh2_SensorConfig_t FlipDetectorConfigSpec_ = { true, false, true, true, 0, 0, 0, 0 };
+static const sh2_SensorConfig_t StabilityDetectorConfigSpec_ = { true, false, false, false, 0, 0, 0, 0 };
+static const sh2_SensorConfig_t SleepDetectorConfigSpec_ = { true, true, true, true, 0, 0, 0, 0 };
+static const sh2_SensorConfig_t TiltDetectorConfigSpec_ = { true, false, true, true, 0, 0, 0, 0 };
+static const sh2_SensorConfig_t PocketDetectorConfigSpec_ = { true, false, true, true, 0, 0, 0, 0 };
+static const sh2_SensorConfig_t CircleDetectorConfigSpec_ = { true, false, true, true, 0, 0, 0, 0 };
+
 
 static sh2_Hal_t sh2Hal_ = {
 	Sh2HalOpen, //
@@ -126,51 +152,53 @@ frsString_s bno080Frs_[] = {
         {GYRO_INTEGRATED_RV_CONFIG, "gyro_integrated_rotation_vector_configuration"},
 };
 
-char const* sensorName_[] = {
-    "Reserved",                     // 0x00
-    "Accelerometer",                // 0x01
-    "Gyroscope",                    // 0x02
-    "Magnetic Field",               // 0x03
-    "Linear Acceleration",          // 0x04
-    "Rotation Vector",              // 0x05
-    "Gravity",                      // 0x06
-    "Uncalibrated Gyroscope",       // 0x07
-    "Game Rotation Vector",         // 0x08
-    "Geomagnetic Rotation Vector",  // 0x09
-    "Pressure",                     // 0x0A
-    "Ambient Light",                // 0x0B
-    "Humidity",                     // 0x0C
-    "Proximity",                    // 0x0D
-    "Temperature",                  // 0x0E
-    "Uncalibrated MagneticField",   // 0x0F
-    "Tap Detector",                 // 0x10
-    "Step Counter",                 // 0x11
-    "Significant Motion",           // 0x12
-    "Stability Classifier",         // 0x13
-    "Raw Accelerometer",            // 0x14
-    "Raw Gyroscope",                // 0x15
-    "Raw Magnetometer",             // 0x16
-    "Reserved",                     // 0x17
-    "Step Detector",                // 0x18
-    "Shake Detector",               // 0x19
-    "Flip Detector",                // 0x1A
-    "Pickup Detector",              // 0x1B
-    "Stability Detector",           // 0x1C
-    "Reserved",                     // 0x1D
-    "Personal Activity Classifier", // 0x1E
-    "Sleep Detector",               // 0x1F
-    "Tilt Detector",                // 0x20
-    "Pocket Detector",              // 0x21
-    "Circle Detector",              // 0x22
-    "Heart Rate Monitor",           // 0x23
-    "Reserved",                     // 0x24
-    "Reserved",                     // 0x25
-    "Reserved",                     // 0x26
-    "Reserved",                     // 0x27
-    "ARVR Stabilized Rotation Vector",      // 0x28
-    "ARVR Stabilized GameRotation Vector",  // 0x29
-    "Gyro Rotation Vector",         // 0x2A
+
+static const sensorSpec_s SensorSpec_[] = {
+    {"Reserved", &DefaultConfigSpec_},                      // 0x00
+    {"Accelerometer", &DefaultConfigSpec_ },                // 0x01
+    {"Gyroscope", &DefaultConfigSpec_ },                    // 0x02
+    {"Magnetic Field", &DefaultConfigSpec_ },               // 0x03
+    {"Linear Acceleration", &DefaultConfigSpec_ },          // 0x04
+    {"Rotation Vector", &DefaultConfigSpec_ },              // 0x05
+    {"Gravity", &DefaultConfigSpec_ },                      // 0x06
+    {"Uncalibrated Gyroscope", &DefaultConfigSpec_ },       // 0x07
+    {"Game Rotation Vector", &DefaultConfigSpec_ },         // 0x08
+    {"Geomagnetic Rotation Vector", &DefaultConfigSpec_ },  // 0x09
+    {"Pressure", &PressureConfigSpec_ },                    // 0x0A
+    {"Ambient Light", &AmbientLightConfigSpec_ },           // 0x0B
+    {"Humidity", &HumidityConfigSpec_ },                    // 0x0C
+    {"Proximity", &ProximityConfigSpec_ },                  // 0x0D
+    {"Temperature", &TemperatureConfigSpec_ },              // 0x0E
+    {"Uncalibrated MagneticField", &DefaultConfigSpec_ },   // 0x0F
+    {"Tap Detector", &TapDetectorConfigSpec_ },             // 0x10
+    {"Step Counter", &DefaultConfigSpec_ },                 // 0x11
+    {"Significant Motion", &DefaultConfigSpec_ },           // 0x12
+    {"Stability Classifier", &StabilityClassifierConfigSpec_ },     // 0x13
+    {"Raw Accelerometer", &DefaultConfigSpec_ },            // 0x14
+    {"Raw Gyroscope", &DefaultConfigSpec_ },                // 0x15
+    {"Raw Magnetometer", &DefaultConfigSpec_ },             // 0x16
+    {"Reserved", &DefaultConfigSpec_ },                     // 0x17
+    {"Step Detector", &StepDetectorConfigSpec_ },           // 0x18
+    {"Shake Detector", &ShakeDetectorConfigSpec_ },         // 0x19
+    {"Flip Detector", &FlipDetectorConfigSpec_ },           // 0x1A
+    {"Pickup Detector", &DefaultConfigSpec_ },              // 0x1B
+    {"Stability Detector", &StabilityDetectorConfigSpec_ }, // 0x1C
+    {"Reserved", &DefaultConfigSpec_ },                     // 0x1D
+    {"Personal Activity Classifier", &PacConfigSpec_ },     // 0x1E
+    {"Sleep Detector", &SleepDetectorConfigSpec_ },         // 0x1F
+    {"Tilt Detector", &TiltDetectorConfigSpec_ },           // 0x20
+    {"Pocket Detector", &PocketDetectorConfigSpec_ },       // 0x21
+    {"Circle Detector", &CircleDetectorConfigSpec_ },       // 0x22
+    {"Heart Rate Monitor", &DefaultConfigSpec_ },           // 0x23
+    {"Reserved", &DefaultConfigSpec_ },                     // 0x24
+    {"Reserved", &DefaultConfigSpec_ },                     // 0x25
+    {"Reserved", &DefaultConfigSpec_ },                     // 0x26
+    {"Reserved", &DefaultConfigSpec_ },                     // 0x27
+    {"ARVR Stabilized Rotation Vector", &DefaultConfigSpec_},      // 0x28
+    {"ARVR Stabilized GameRotation Vector", &DefaultConfigSpec_ },  // 0x29
+    {"Gyro Rotation Vector", &DefaultConfigSpec_ },         // 0x2A
 };
+
 
 // =================================================================================================
 // LOCAL FUNCTIONS
@@ -349,7 +377,7 @@ int LoggerApp::init(appConfig_s* appConfig, TimerSrv* timer, FtdiHal* ftdiHal, D
     for (SensorList_t::iterator it = sensorsToEnable_.begin(); it != sensorsToEnable_.end(); ++it) {
         GetSensorConfiguration(*it, &config);
         config.reportInterval_us = reportInterval_us;
-        std::cout << "INFO: Sensor ID : " << *it << " - " << sensorName_[*it] << "\n";
+        std::cout << "INFO: Sensor ID : " << *it << " - " << SensorSpec_[*it].name << "\n";
         sh2_setSensorConfig(*it, &config);
     }
     
@@ -506,8 +534,9 @@ void LoggerApp::ProcessConfigFile(SensorList_t* sensorsToEnable, LoggerApp::appC
         sensorsToEnable_.unique();
 
     } else {
+        // sensor list configuration file is not found. clear the appConfig->config field
         pConfig->config = false;
-        std::cout << "WARNING: sensorList.cfg is NOT found.\n";
+        std::cout << "\nWARNING: sensorList.cfg is NOT found.\n";
     }
     infile.close();
 }
@@ -646,14 +675,7 @@ void LoggerApp::UpdateSensorList(SensorList_t* sensorsToEnable, LoggerApp::appCo
 // LoggerApp::GetSensorConfiguration
 // -------------------------------------------------------------------------------------------------
 void LoggerApp::GetSensorConfiguration(sh2_SensorId_t sensorId, sh2_SensorConfig_t* pConfig) {
-    memset(pConfig, 0, sizeof(sh2_SensorConfig_t));
-
-    if (sensorId == SH2_PERSONAL_ACTIVITY_CLASSIFIER) {
-        pConfig->sensorSpecific = 511;
-
-    } else if (sensorId == SH2_STEP_DETECTOR) {
-        pConfig->changeSensitivityEnabled = true;
-    }
+    memcpy(pConfig, SensorSpec_[sensorId].config, sizeof(sh2_SensorConfig_t));
 }
 
 
