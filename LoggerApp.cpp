@@ -351,12 +351,12 @@ int LoggerApp::init(appConfig_s* appConfig, TimerSrv* timer, FtdiHal* ftdiHal, D
     // Enable Sensors
 
     // Check if a config file is specified.
-    if (appConfig->config) {
+    if (appConfig->batch) {
         ProcessConfigFile(&sensorsToEnable_, appConfig);
     }
 
     // Update the list of enabled sensors based on the mode/step/pac options
-    if (!appConfig->config) {
+    if (!appConfig->batch) {
         UpdateSensorList(&sensorsToEnable_, appConfig);
 
         if (appConfig->pac) {
@@ -517,16 +517,16 @@ bool LoggerApp::WaitForResetComplete(int loops) {
 // LoggerApp::ProcessConfigFile
 // -------------------------------------------------------------------------------------------------
 void LoggerApp::ProcessConfigFile(SensorList_t* sensorsToEnable, LoggerApp::appConfig_s* pConfig) {
-    std::ifstream infile("sensorlist.cfg");
+    std::ifstream infile("sensorlist.lst");
     if (infile.is_open()) {
-        std::cout << "\nINFO: Extract Sensor list from sensorlist.cfg\n";
+        std::cout << "\nINFO: Extract Sensor list from sensorlist.lst\n";
 
         sh2_SensorId_t sensorId;
         int id;
         while (infile >> id) {
             sensorId = (sh2_SensorId_t)id;
             if (sensorId <= SH2_MAX_SENSOR_ID) {
-                std::cout << "INFO: (.cfg) Sensor ID " << id << " \n";
+                std::cout << "INFO: (.lst) Sensor ID " << id << " \n";
                 sensorsToEnable_.push_back(sensorId);
             }
         }
@@ -534,9 +534,9 @@ void LoggerApp::ProcessConfigFile(SensorList_t* sensorsToEnable, LoggerApp::appC
         sensorsToEnable_.unique();
 
     } else {
-        // sensor list configuration file is not found. clear the appConfig->config field
-        pConfig->config = false;
-        std::cout << "\nWARNING: sensorList.cfg is NOT found.\n";
+        // sensor list configuration file is not found. clear the appConfig->batch field
+        pConfig->batch = false;
+        std::cout << "\nWARNING: sensorList.lst is NOT found.\n";
     }
     infile.close();
 }

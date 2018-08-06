@@ -43,7 +43,7 @@ make -f Makefile
 
 ## Running the application
 ```
-Usage: sh2_ftdi_logger.exe <out.dsf> [--deviceNumber=<id>] [--rate=<rate>] [--raw] [--calibrated] [--uncalibrated] [--mode=<9agm,6ag,6am,6gm,3a,3g,3m,all>] [--dcdAutoSave] [--calEnable=0x<mask>]
+Usage: sh2_ftdi_logger.exe <out.dsf> [--deviceNumber=<id>] [--rate=<rate>] [--raw] [--calibrated] [--uncalibrated] [--mode=<9agm,6ag,6am,6gm,3a,3g,3m,all>] [--dcdAutoSave] [--calEnable=0x<mask>][--config]
    out.dsf              - output dsf file
    --deviceNumber=<id>  - which device to open.  0 for a single device.
    --rate=<rate>        - requested sampling rate for all sensors.  Default: 100Hz
@@ -54,6 +54,8 @@ Usage: sh2_ftdi_logger.exe <out.dsf> [--deviceNumber=<id>] [--rate=<rate>] [--ra
    --dcdAutoSave        - enable DCD auto saving.  No dcd save by default.
    --clearDcd           - clear DCD and reset upon startup.
    --calEnable=0x<mask> - cal enable mask.  Bits: Planar, A, G, M.  Default 0x8
+   --orientation=<orientation> - system orientation. enu, ned. Default: ned
+   --batch              - get the list of sensors from sensorList.lst file
 ```
 
 The list of sensor reports generated for each mode and options.
@@ -78,6 +80,19 @@ The SensorHub device is connected to /dev/ttyUSB2.
 sh2_ftdi_logger.exe out_2.dsf --deviceNumber=2 --raw --mode=6ag
 ```
 
+Run DSF logger in 'batch' mode to enable the GameRV sensors along with the Activity Classifer and the Step Detector
+
+Create a batch file called 'sensorList.lst'. List out the SH2 Sensor ID of the required sensors; one sensor per line.
+```
+8
+24
+30
+```
+
+To Run the DSF logger.
+```
+sh2_ftdi_logger.exe out_2.dsf --deviceNumber=2 --batch
+```
 
 ## License
 

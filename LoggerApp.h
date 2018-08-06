@@ -72,7 +72,7 @@ public:
         bool clearDcd = false;
         uint8_t calEnableMask = 0x8; // TODO review data type
         bool orientationNed = true;
-        bool config = false;
+        bool batch = false;
     };
 
     int init(appConfig_s* appConfig, TimerSrv* timer, FtdiHal* ftdiHal, DsfLogger* logger);
