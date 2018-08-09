@@ -167,7 +167,7 @@ void DsfLogger::logSensorValue(sh2_SensorValue_t* pValue, double currTime) {
             static SampleIdExtender extender;
             if (extender.isEmpty()) {
                 LogHeader(id,
-                    "MOST_LIKELY_STATE[x]{state},CONFIDENCE[uvbfstwrax]{state}",
+                    "MOST_LIKELY_STATE[x]{state},CONFIDENCE[uvbfstwrax]{state},STATUS[x]",
                     "PersonalActivityClassifier", false);
             }
             // fleung
@@ -188,7 +188,7 @@ void DsfLogger::logSensorValue(sh2_SensorValue_t* pValue, double currTime) {
             static SampleIdExtender extender;
             if (extender.isEmpty()) {
                 LogHeader(id,
-                    "STEP_DETECTOR_LATENCY[x]{us}",
+                    "STEP_DETECTOR_LATENCY[x]{us},STATUS[x]",
                     "StepDetector", false);
             }
             outFile_ << "." << id << " ";
@@ -196,6 +196,23 @@ void DsfLogger::logSensorValue(sh2_SensorValue_t* pValue, double currTime) {
             outFile_.unsetf(std::ios_base::floatfield);
             outFile_ << extender.extend(pValue->sequence) << ",";
             outFile_ << pValue->un.stepDetector.latency << ",";
+            outFile_ << static_cast<uint32_t>(pValue->status) << "\n";
+            break;
+        }
+
+        case SH2_STEP_COUNTER: {
+            static SampleIdExtender extender;
+            if (extender.isEmpty()) {
+                LogHeader(id,
+                    "STEPS[x]{steps}, STEP_COUNTER_LATENCY[x]{us},STATUS[x]",
+                    "StepCounter", false);
+            }
+            outFile_ << "." << id << " ";
+            outFile_ << std::fixed << std::setprecision(9) << currTime << ",";
+            outFile_.unsetf(std::ios_base::floatfield);
+            outFile_ << extender.extend(pValue->sequence) << ",";
+            outFile_ << pValue->un.stepCounter.steps << ",";
+            outFile_ << pValue->un.stepCounter.latency << ",";
             outFile_ << static_cast<uint32_t>(pValue->status) << "\n";
             break;
         }
