@@ -57,7 +57,7 @@ Usage: sh2_ftdi_logger.exe <out.dsf> [--deviceNumber=<id>] [--rate=<rate>] [--ra
    --clearDcd           - clear DCD and reset upon startup.
    --calEnable=0x<mask> - cal enable mask.  Bits: Planar, A, G, M.  Default 0x8
    --orientation=<orientation> - system orientation. enu, ned. Default: ned
-   --batch              - get the list of sensors from sensorList.lst file. When enabled, the raw, calibrated, uncalibrated, mode, step and pac options are ignored. 
+   --batch              - get the list of sensors from sensorlist.lst file. When enabled, the raw, calibrated, uncalibrated, mode, step and pac options are ignored. 
 ```
 
 The list of sensor reports generated for each mode and options.
@@ -83,7 +83,7 @@ sh2_ftdi_logger.exe out_2.dsf --deviceNumber=2 --raw --mode=6ag
 ```
 
 
-Run DSF logger in 'batch' mode to enable the GameRV sensors along with the Activity Classifier and the Step Detector. Create a batch file called 'sensorList.lst'. List out the SH2 Sensor ID of the required sensors; one sensor per line.
+Run DSF logger in 'batch' mode to enable the GameRV sensors along with the Activity Classifier and the Step Detector. Create a batch file called 'sensorlist.lst'. List out the SH2 Sensor ID of the required sensors; one sensor per line.
 ```
 8
 24

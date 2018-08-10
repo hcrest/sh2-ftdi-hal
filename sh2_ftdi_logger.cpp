@@ -89,7 +89,7 @@ void usage(const char* myname) {
             "   --clearDcd           - clear DCD and reset upon startup.\n"
             "   --calEnable=0x<mask> - cal enable mask.  Bits: Planar, A, G, M.  Default 0x8\n"
             "   --orientation=<orientation> - system orientation. enu, ned. Default: ned\n",
-            "   --batch              - get the list of sensors from sensorList.lst file. When enabled, the raw, calibrated, uncalibrated, mode, step and pac options are ignored. \n",
+            "   --batch              - get the list of sensors from sensorlist.lst file. When enabled, the raw, calibrated, uncalibrated, mode, step and pac options are ignored. \n",
             myname);
 }
 

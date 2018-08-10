@@ -537,7 +537,7 @@ void LoggerApp::ProcessConfigFile(SensorList_t* sensorsToEnable, LoggerApp::appC
     } else {
         // sensor list configuration file is not found. clear the appConfig->batch field
         pConfig->batch = false;
-        std::cout << "\nWARNING: sensorList.lst is NOT found.\n";
+        std::cout << "\nWARNING: sensorlist.lst is NOT found.\n";
     }
     infile.close();
 }
