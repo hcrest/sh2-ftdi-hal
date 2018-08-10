@@ -228,7 +228,12 @@ void myEventCallback(void* cookie, sh2_AsyncEvent_t* pEvent) {
 // -------------------------------------------------------------------------------------------------
 void mySensorCallback(void* cookie, sh2_SensorEvent_t* pEvent) {
     sh2_SensorValue_t value;
-    sh2_decodeSensorEvent(&value, pEvent);
+    int rc = SH2_OK;
+
+    rc = sh2_decodeSensorEvent(&value, pEvent);
+    if (rc != SH2_OK) {
+        return;
+    }
 
     if (useSampleTime) {
         switch (value.sensorId) {
