@@ -365,6 +365,7 @@ int LoggerApp::init(appConfig_s* appConfig, TimerSrv* timer, FtdiHal* ftdiHal, D
 
         if (appConfig->step) {
             sensorsToEnable_.push_back(SH2_STEP_DETECTOR);
+            sensorsToEnable_.push_back(SH2_STEP_COUNTER);
         }
     }
 

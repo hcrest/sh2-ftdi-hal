@@ -503,12 +503,11 @@ void DsfLogger::LogHeader(uint8_t sensorId, char const* fieldNames, char const* 
     outFile_ << "+" << static_cast<int32_t>(sensorId) << " TIME{s},SAMPLE_ID[x]," << fieldNames
         << "\n";
     if (orientation) {
-        outFile_ << "!" << static_cast<int32_t>(sensorId);
+        outFile_ << "!" << static_cast<int32_t>(sensorId) << " coordinate_system=";
         if (orientationNed_) {
-            outFile_ << " coordinate_system=\"NED\"\n";
-        }
-        else {
-            outFile_ << " coordinate_system=\"ENU\"\n";
+            outFile_ << "\"NED\"\n";
+        } else {
+            outFile_ << "\"ENU\"\n";
         }
     }
     outFile_ << "!" << static_cast<int32_t>(sensorId) << " name=\"" << name << "\"\n";

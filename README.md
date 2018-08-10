@@ -51,7 +51,7 @@ Usage: sh2_ftdi_logger.exe <out.dsf> [--deviceNumber=<id>] [--rate=<rate>] [--ra
    --calibrated         - include calibrated output sensors
    --uncalibrated       - include uncalibrated output sensors
    --mode=<mode>        - sensors types to log.  9agm, 6ag, 6am, 6gm, 3a, 3g, 3m or all.
-   --step               - include step detector.
+   --step               - include step detector and step counter.
    --pac                - include activity classifier.
    --dcdAutoSave        - enable DCD auto saving.  No dcd save by default.
    --clearDcd           - clear DCD and reset upon startup.
