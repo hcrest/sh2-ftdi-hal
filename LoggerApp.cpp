@@ -523,16 +523,16 @@ bool LoggerApp::WaitForResetComplete(int loops) {
 // LoggerApp::ProcessConfigFile
 // -------------------------------------------------------------------------------------------------
 void LoggerApp::ProcessConfigFile(SensorList_t* sensorsToEnable, LoggerApp::appConfig_s* pConfig) {
-    std::ifstream infile("sensorlist.lst");
+    std::ifstream infile(pConfig->batchFilePath);
     if (infile.is_open()) {
-        std::cout << "\nINFO: Extract Sensor list from sensorlist.lst\n";
+        std::cout << "\nINFO: Extract Sensor list from " << pConfig->batchFilePath << "\n";
 
         sh2_SensorId_t sensorId;
         int id;
         while (infile >> id) {
             sensorId = (sh2_SensorId_t)id;
             if (sensorId <= SH2_MAX_SENSOR_ID) {
-                std::cout << "INFO: (.lst) Sensor ID " << id << " \n";
+                std::cout << "INFO: (batch) Sensor ID " << id << " \n";
                 sensorsToEnable_.push_back(sensorId);
             }
         }
@@ -541,8 +541,9 @@ void LoggerApp::ProcessConfigFile(SensorList_t* sensorsToEnable, LoggerApp::appC
 
     } else {
         // sensor list configuration file is not found. clear the appConfig->batch field
+        std::cout << "\nWARNING: Batch file " << pConfig->batchFilePath << " is NOT found.\n";
         pConfig->batch = false;
-        std::cout << "\nWARNING: sensorlist.lst is NOT found.\n";
+        pConfig->batchFilePath = NULL;
     }
     infile.close();
 }

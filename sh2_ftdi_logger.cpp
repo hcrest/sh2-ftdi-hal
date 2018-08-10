@@ -57,6 +57,9 @@ static FtdiHalRpi ftdiHal_;
 static DsfLogger logger_;
 static bool runApp_ = true;
 
+static const char sensorListFile[] = "./sensorlist.lst";
+
+
 // =================================================================================================
 // LOCAL FUNCTIONS
 // =================================================================================================
@@ -89,7 +92,8 @@ void usage(const char* myname) {
             "   --clearDcd           - clear DCD and reset upon startup.\n"
             "   --calEnable=0x<mask> - cal enable mask.  Bits: Planar, A, G, M.  Default 0x8\n"
             "   --orientation=<orientation> - system orientation. enu, ned. Default: ned\n"
-            "   --batch              - get the list of sensors from sensorlist.lst file. When enabled, the raw, calibrated, uncalibrated, mode, step and pac options are ignored. \n",
+            "   --batch=<filePath>   - get the list of sensors from the batch file specified. "
+            "When enabled, the raw, calibrated, uncalibrated, mode, step and pac options are ignored.\n",
             myname);
 }
 
@@ -162,8 +166,14 @@ int main(int argc, const char* argv[]) {
                 } else {
                     appConfig.orientationNed = true;
                 }
-            } else if (strcmp(arg, "--batch") == 0) {
-                    appConfig.batch = true;
+            } else if (strstr(arg, "--batch") == arg) {
+                appConfig.batch = true;
+                const char* val = strchr(arg, '=');
+                if (val) {
+                    appConfig.batchFilePath = val + 1;
+                } else {
+                    appConfig.batchFilePath = sensorListFile;
+                }
             } else {
                 fprintf(stderr, "Unknown argument: %s\n", arg);
                 argError = true;
