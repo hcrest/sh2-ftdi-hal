@@ -170,7 +170,6 @@ void DsfLogger::logSensorValue(sh2_SensorValue_t* pValue, double currTime) {
                     "MOST_LIKELY_STATE[x]{state},CONFIDENCE[uvbfstwrax]{state},STATUS[x]",
                     "PersonalActivityClassifier", false);
             }
-            // fleung
             outFile_ << "." << id << " ";
             outFile_ << std::fixed << std::setprecision(9) << currTime << ",";
             outFile_.unsetf(std::ios_base::floatfield);
