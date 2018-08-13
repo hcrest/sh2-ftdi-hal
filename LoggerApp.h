@@ -73,7 +73,7 @@ public:
         uint8_t calEnableMask = 0x8; // TODO review data type
         bool orientationNed = true;
         bool batch = false;
-        char const * batchFilePath = NULL;
+        char const * batchFilePath = 0;
     };
 
     int init(appConfig_s* appConfig, TimerSrv* timer, FtdiHal* ftdiHal, DsfLogger* logger);
