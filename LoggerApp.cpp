@@ -87,6 +87,7 @@ static const sh2_SensorConfig_t DefaultConfigSpec_ = { false, false, false, fals
 static const sh2_SensorConfig_t PacConfigSpec_ = { false, false, false, false, 0, 0, 0, 511 };
 static const sh2_SensorConfig_t StabilityClassifierConfigSpec_ = { true, true, false, false, 0, 0, 0, 0 };
 static const sh2_SensorConfig_t StepDetectorConfigSpec_ = { true, false, false, false, 0, 0, 0, 0 };
+static const sh2_SensorConfig_t StepCounterConfigSpec_ = { true, false, false, false, 0, 0, 0, 0 };
 static const sh2_SensorConfig_t PressureConfigSpec_ = { false, false, false, false, 0, 0, 0, 0 };
 static const sh2_SensorConfig_t AmbientLightConfigSpec_ = { true, true, false, false, (uint16_t)(0.1 * (2 ^ 6)), 0, 0, 0 };
 static const sh2_SensorConfig_t TemperatureConfigSpec_ = { true, true, false, false, (uint16_t)(0.1 * (2 ^ 7)), 0, 0, 0 };
@@ -171,7 +172,7 @@ static const sensorSpec_s SensorSpec_[] = {
     {"Temperature", &TemperatureConfigSpec_ },              // 0x0E
     {"Uncalibrated MagneticField", &DefaultConfigSpec_ },   // 0x0F
     {"Tap Detector", &TapDetectorConfigSpec_ },             // 0x10
-    {"Step Counter", &DefaultConfigSpec_ },                 // 0x11
+    {"Step Counter", &StepCounterConfigSpec_ },             // 0x11
     {"Significant Motion", &DefaultConfigSpec_ },           // 0x12
     {"Stability Classifier", &StabilityClassifierConfigSpec_ },     // 0x13
     {"Raw Accelerometer", &DefaultConfigSpec_ },            // 0x14
