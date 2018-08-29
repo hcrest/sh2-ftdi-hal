@@ -55,7 +55,7 @@ static const sensorDsfHeader_s SensorDsfHeader_[] = {
     { "UncalibratedMagField", "MAG_UNCAL[xyz]{m/s^2},MAG_BAIS[xyz]{m/s^2},STATUS[x]" },                         // 0x0F
     { "TapDetector", "TAP_DETECTOR[x]{state},STATUS[x]" },                                                      // 0x10
     { "StepCounter", "STEPS[x]{steps}, STEP_COUNTER_LATENCY[x]{us},STATUS[x]" },                                // 0x11
-    { "Significant Motion", "" },                                                                               // 0x12
+    { "SignificantMotion", "SIGNIFICANT_MOTION[x]{state},STATUS[x]" },                                          // 0x12
     { "StabilityClassifier", "STABILITY_CLASSIFIER[x]{state},STATUS[x]" },                                      // 0x13
     { "RawAccelerometer", "LIN_ACC_GRAVITY[xyz]{ADC}" },                                                        // 0x14
     { "RawGyroscope", "ANG_VEL[xyz]{ADC},TEMPERATURE[x]{ADC}" },                                                // 0x15
@@ -72,7 +72,7 @@ static const sensorDsfHeader_s SensorDsfHeader_[] = {
     { "TiltDetector", "TILT_DETECTOR[x]{state},STATUS[x]" },                                                    // 0x20
     { "PocketDetector", "POCKET_DETECTOR[x]{state},STATUS[x]" },                                                // 0x21
     { "CircleDetector", "CIRCLE_DETECTOR[x]{state},STATUS[x]" },                                                // 0x22
-    { "Heart Rate Monitor", "" },                                                                               // 0x23
+    { "HeartRateMonitor", "HEART_RATE_MONITOR[x]{?},STATUS[x]" },                                               // 0x23
     { "Reserved", "" },                                                                                         // 0x24
     { "Reserved", "" },                                                                                         // 0x25
     { "Reserved", "" },                                                                                         // 0x26
@@ -766,6 +766,30 @@ void DsfLogger::logSensorValue(sh2_SensorValue_t* pValue, double currTime) {
             LogReportCommon(id, currTime);
             outFile_ << extender.extend(pValue->sequence) << ",";
             outFile_ << pValue->un.temperature.value << ",";
+            outFile_ << static_cast<uint32_t>(pValue->status) << "\n";
+            break;
+        }
+
+        case SH2_SIGNIFICANT_MOTION: {
+            static SampleIdExtender extender;
+            if (extender.isEmpty()) {
+                LogHeader(id, false);
+            }
+            LogReportCommon(id, currTime);
+            outFile_ << extender.extend(pValue->sequence) << ",";
+            outFile_ << pValue->un.sigMotion.motion << ",";
+            outFile_ << static_cast<uint32_t>(pValue->status) << "\n";
+            break;
+        }
+
+        case SH2_HEART_RATE_MONITOR: {
+            static SampleIdExtender extender;
+            if (extender.isEmpty()) {
+                LogHeader(id, false);
+            }
+            LogReportCommon(id, currTime);
+            outFile_ << extender.extend(pValue->sequence) << ",";
+            outFile_ << pValue->un.heartRateMonitor.heartRate << ",";
             outFile_ << static_cast<uint32_t>(pValue->status) << "\n";
             break;
         }
