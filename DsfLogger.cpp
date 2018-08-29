@@ -52,26 +52,26 @@ static const sensorDsfHeader_s SensorDsfHeader_[] = {
     { "Humidity", "" },                                                                                         // 0x0C
     { "Proximity", "" },                                                                                        // 0x0D
     { "Temperature", "" },                                                                                      // 0x0E
-    { "UncalibratedMagField", "MAG_UNCAL[xyz]{m/s^2},MAG_BAIS[xyz]{m/s^2},STATUS[x" },                          // 0x0F
-    { "Tap Detector", "" },                                                                                     // 0x10
+    { "UncalibratedMagField", "MAG_UNCAL[xyz]{m/s^2},MAG_BAIS[xyz]{m/s^2},STATUS[x]" },                         // 0x0F
+    { "TapDetector", "TAP_DETECTOR[x]{state},STATUS[x]" },                                                      // 0x10
     { "StepCounter", "STEPS[x]{steps}, STEP_COUNTER_LATENCY[x]{us},STATUS[x]" },                                // 0x11
     { "Significant Motion", "" },                                                                               // 0x12
-    { "Stability Classifier", "" },                                                                             // 0x13
+    { "StabilityClassifier", "STABILITY_CLASSIFIER[x]{state},STATUS[x]" },                                      // 0x13
     { "RawAccelerometer", "LIN_ACC_GRAVITY[xyz]{ADC}" },                                                        // 0x14
     { "RawGyroscope", "ANG_VEL[xyz]{ADC},TEMPERATURE[x]{ADC}" },                                                // 0x15
     { "RawMagnetometer", "MAG[xyz]{ADC}" },                                                                     // 0x16
     { "Reserved", "" },                                                                                         // 0x17
     { "StepDetector", "STEP_DETECTOR_LATENCY[x]{us},STATUS[x]" },                                               // 0x18
-    { "Shake Detector", "" },                                                                                   // 0x19
-    { "Flip Detector", "" },                                                                                    // 0x1A
-    { "Pickup Detector", "" },                                                                                  // 0x1B
-    { "Stability Detector", "" },                                                                               // 0x1C
+    { "ShakeDetector", "SHAKE_DETECTOR[x]{state},STATUS[x]" },                                                  // 0x19
+    { "FlipDetector", "FLIP_DETECTOR[x]{state,STATUS[x]}" },                                                    // 0x1A
+    { "PickupDetector", "PICKUP_DETECTOR[x]{state},STATUS[x]" },                                                // 0x1B
+    { "StabilityDetector", "STABILITY_DETECTOR[x]{state},STATUS[x]" },                                          // 0x1C
     { "Reserved", "" },                                                                                         // 0x1D
     { "PersonalActivityClassifier", "MOST_LIKELY_STATE[x]{state},CONFIDENCE[uvbfstwrax]{state},STATUS[x]" },    // 0x1E
-    { "Sleep Detector", "" },                                                                                   // 0x1F
-    { "Tilt Detector", "" },                                                                                    // 0x20
-    { "Pocket Detector", "" },                                                                                  // 0x21
-    { "Circle Detector", "" },                                                                                  // 0x22
+    { "SleepDetector", "SLEEP_DETECTOR[x]{state},STATUS[x]" },                                                  // 0x1F
+    { "TiltDetector", "TILT_DETECTOR[x]{state},STATUS[x]" },                                                    // 0x20
+    { "PocketDetector", "POCKET_DETECTOR[x]{state},STATUS[x]" },                                                // 0x21
+    { "CircleDetector", "CIRCLE_DETECTOR[x]{state},STATUS[x]" },                                                // 0x22
     { "Heart Rate Monitor", "" },                                                                               // 0x23
     { "Reserved", "" },                                                                                         // 0x24
     { "Reserved", "" },                                                                                         // 0x25
@@ -586,6 +586,126 @@ void DsfLogger::logSensorValue(sh2_SensorValue_t* pValue, double currTime) {
                 outFile_ << pValue->un.arvrStabilizedGRV.j << ",";
                 outFile_ << pValue->un.arvrStabilizedGRV.k << ",";
             }
+            outFile_ << static_cast<uint32_t>(pValue->status) << "\n";
+            break;
+        }
+
+        case SH2_TAP_DETECTOR: {
+            static SampleIdExtender extender;
+            if (extender.isEmpty()) {
+                LogHeader(id, false);
+            }
+            LogReportCommon(id, currTime);
+            outFile_ << extender.extend(pValue->sequence) << ",";
+            outFile_ << pValue->un.tapDetector.flags << ",";
+            outFile_ << static_cast<uint32_t>(pValue->status) << "\n";
+            break;
+        }
+
+        case SH2_CIRCLE_DETECTOR: {
+            static SampleIdExtender extender;
+            if (extender.isEmpty()) {
+                LogHeader(id, false);
+            }
+            LogReportCommon(id, currTime);
+            outFile_ << extender.extend(pValue->sequence) << ",";
+            outFile_ << pValue->un.circleDetector.circle << ",";
+            outFile_ << static_cast<uint32_t>(pValue->status) << "\n";
+            break;
+        }
+
+        case SH2_FLIP_DETECTOR: {
+            static SampleIdExtender extender;
+            if (extender.isEmpty()) {
+                LogHeader(id, false);
+            }
+            LogReportCommon(id, currTime);
+            outFile_ << extender.extend(pValue->sequence) << ",";
+            outFile_ << pValue->un.flipDetector.flip << ",";
+            outFile_ << static_cast<uint32_t>(pValue->status) << "\n";
+            break;
+        }
+
+        case SH2_PICKUP_DETECTOR: {
+            static SampleIdExtender extender;
+            if (extender.isEmpty()) {
+                LogHeader(id, false);
+            }
+            LogReportCommon(id, currTime);
+            outFile_ << extender.extend(pValue->sequence) << ",";
+            outFile_ << pValue->un.pickupDetector.pickup << ",";
+            outFile_ << static_cast<uint32_t>(pValue->status) << "\n";
+            break;
+        }
+
+        case SH2_POCKET_DETECTOR: {
+            static SampleIdExtender extender;
+            if (extender.isEmpty()) {
+                LogHeader(id, false);
+            }
+            LogReportCommon(id, currTime);
+            outFile_ << extender.extend(pValue->sequence) << ",";
+            outFile_ << pValue->un.pocketDetector.pocket << ",";
+            outFile_ << static_cast<uint32_t>(pValue->status) << "\n";
+            break;
+        }
+
+        case SH2_TILT_DETECTOR: {
+            static SampleIdExtender extender;
+            if (extender.isEmpty()) {
+                LogHeader(id, false);
+            }
+            LogReportCommon(id, currTime);
+            outFile_ << extender.extend(pValue->sequence) << ",";
+            outFile_ << pValue->un.tiltDetector.tilt << ",";
+            outFile_ << static_cast<uint32_t>(pValue->status) << "\n";
+            break;
+        }
+
+        case SH2_SHAKE_DETECTOR: {
+            static SampleIdExtender extender;
+            if (extender.isEmpty()) {
+                LogHeader(id, false);
+            }
+            LogReportCommon(id, currTime);
+            outFile_ << extender.extend(pValue->sequence) << ",";
+            outFile_ << pValue->un.shakeDetector.shake << ",";
+            outFile_ << static_cast<uint32_t>(pValue->status) << "\n";
+            break;
+        }
+
+        case SH2_SLEEP_DETECTOR: {
+            static SampleIdExtender extender;
+            if (extender.isEmpty()) {
+                LogHeader(id, false);
+            }
+            LogReportCommon(id, currTime);
+            outFile_ << extender.extend(pValue->sequence) << ",";
+            outFile_ << pValue->un.sleepDetector.sleepState << ",";
+            outFile_ << static_cast<uint32_t>(pValue->status) << "\n";
+            break;
+        }
+
+        case SH2_STABILITY_CLASSIFIER: {
+            static SampleIdExtender extender;
+            if (extender.isEmpty()) {
+                LogHeader(id, false);
+            }
+            LogReportCommon(id, currTime);
+            outFile_ << extender.extend(pValue->sequence) << ",";
+            outFile_ << static_cast<uint32_t>(pValue->un.stabilityClassifier.classification) << ",";
+            outFile_ << static_cast<uint32_t>(pValue->status) << "\n";
+            break;
+        }
+
+        case SH2_STABILITY_DETECTOR: {
+            static SampleIdExtender extender;
+            if (extender.isEmpty()) {
+                LogHeader(id, false);
+            }
+            LogReportCommon(id, currTime);
+            outFile_ << extender.extend(pValue->sequence) << ",";
+            outFile_ << pValue->un.stabilityDetector.stability << ",";
             outFile_ << static_cast<uint32_t>(pValue->status) << "\n";
             break;
         }
