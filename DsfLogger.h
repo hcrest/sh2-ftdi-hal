@@ -50,7 +50,7 @@ private:
     std::ofstream outFile_;
     bool orientationNed_;
 
-    void LogHeader(uint8_t sensorId, char const* fieldNames, char const* name, bool orientation = true);
+    void LogHeader(uint8_t sensorId, bool orientation = true);
 };
 
 #endif // DSF_LOGGER_H
