@@ -486,6 +486,50 @@ void DsfLogger::logSensorValue(sh2_SensorValue_t* pValue, double currTime) {
             break;
         }
 
+        case SH2_LINEAR_ACCELERATION: {
+            static SampleIdExtender extender;
+            if (extender.isEmpty()) {
+                LogHeader(id, "LIN_ACC[xyz]{m/s^2},STATUS[x]", "LinearAcceleration");
+            }
+            outFile_ << "." << id << " ";
+            outFile_ << std::fixed << std::setprecision(9) << currTime << ",";
+            outFile_.unsetf(std::ios_base::floatfield);
+            outFile_ << extender.extend(pValue->sequence) << ",";
+            if (orientationNed_) {
+                outFile_ << pValue->un.linearAcceleration.y << ","; // ENU -> NED
+                outFile_ << pValue->un.linearAcceleration.x << ",";
+                outFile_ << -pValue->un.linearAcceleration.z << ",";
+            } else {
+                outFile_ << pValue->un.linearAcceleration.x << ",";
+                outFile_ << pValue->un.linearAcceleration.y << ",";
+                outFile_ << pValue->un.linearAcceleration.z << ",";
+            }
+            outFile_ << static_cast<uint32_t>(pValue->status) << "\n";
+            break;
+        }
+
+        case SH2_GRAVITY: {
+            static SampleIdExtender extender;
+            if (extender.isEmpty()) {
+                LogHeader(id, "GRAVITY[xyz]{m/s^2},STATUS[x]", "Gravity");
+            }
+            outFile_ << "." << id << " ";
+            outFile_ << std::fixed << std::setprecision(9) << currTime << ",";
+            outFile_.unsetf(std::ios_base::floatfield);
+            outFile_ << extender.extend(pValue->sequence) << ",";
+            if (orientationNed_) {
+                outFile_ << pValue->un.gravity.y << ","; // ENU -> NED
+                outFile_ << pValue->un.gravity.x << ",";
+                outFile_ << -pValue->un.gravity.z << ",";
+            } else {
+                outFile_ << pValue->un.gravity.x << ",";
+                outFile_ << pValue->un.gravity.y << ",";
+                outFile_ << pValue->un.gravity.z << ",";
+            }
+            outFile_ << static_cast<uint32_t>(pValue->status) << "\n";
+            break;
+        }
+
         default:
             break;
     }
