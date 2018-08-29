@@ -530,6 +530,59 @@ void DsfLogger::logSensorValue(sh2_SensorValue_t* pValue, double currTime) {
             break;
         }
 
+        case SH2_ARVR_STABILIZED_RV: {
+            static SampleIdExtender extender;
+            if (extender.isEmpty()) {
+                LogHeader(id,
+                    "ANG_POS_GLOBAL[wxyz]{quaternion},ANG_POS_ACCURACY[x]{deg},STATUS[x]",
+                    "ARVRStabilizedRotationVector");
+            }
+            outFile_ << "." << id << " ";
+            outFile_ << std::fixed << std::setprecision(9) << currTime << ",";
+            outFile_.unsetf(std::ios_base::floatfield);
+            outFile_ << extender.extend(pValue->sequence) << ",";
+            if (orientationNed_) {
+                outFile_ << pValue->un.arvrStabilizedRV.real << ",";
+                outFile_ << pValue->un.arvrStabilizedRV.j << ","; // Convert ENU -> NED
+                outFile_ << pValue->un.arvrStabilizedRV.i << ",";
+                outFile_ << -pValue->un.arvrStabilizedRV.k << ",";
+            } else {
+                outFile_ << pValue->un.arvrStabilizedRV.real << ",";
+                outFile_ << pValue->un.arvrStabilizedRV.i << ",";
+                outFile_ << pValue->un.arvrStabilizedRV.j << ",";
+                outFile_ << pValue->un.arvrStabilizedRV.k << ",";
+            }
+            outFile_ << (pValue->un.arvrStabilizedRV.accuracy * 180.0 / PI) << ",";
+            outFile_ << static_cast<uint32_t>(pValue->status) << "\n";
+            break;
+        }
+
+        case SH2_ARVR_STABILIZED_GRV: {
+            static SampleIdExtender extender;
+            if (extender.isEmpty()) {
+                LogHeader(id,
+                    "ANG_POS_GLOBAL[wxyz]{quaternion},STATUS[x]",
+                    "ARVRStabilizedGameRotationVector");
+            }
+            outFile_ << "." << id << " ";
+            outFile_ << std::fixed << std::setprecision(9) << currTime << ",";
+            outFile_.unsetf(std::ios_base::floatfield);
+            outFile_ << extender.extend(pValue->sequence) << ",";
+            if (orientationNed_) {
+                outFile_ << pValue->un.arvrStabilizedGRV.real << ",";
+                outFile_ << pValue->un.arvrStabilizedGRV.j << ","; // Convert ENU -> NED
+                outFile_ << pValue->un.arvrStabilizedGRV.i << ",";
+                outFile_ << -pValue->un.arvrStabilizedGRV.k << ",";
+            } else {
+                outFile_ << pValue->un.arvrStabilizedGRV.real << ",";
+                outFile_ << pValue->un.arvrStabilizedGRV.i << ",";
+                outFile_ << pValue->un.arvrStabilizedGRV.j << ",";
+                outFile_ << pValue->un.arvrStabilizedGRV.k << ",";
+            }
+            outFile_ << static_cast<uint32_t>(pValue->status) << "\n";
+            break;
+        }
+
         default:
             break;
     }
