@@ -231,9 +231,7 @@ void DsfLogger::logSensorValue(sh2_SensorValue_t* pValue, double currTime) {
             if (extender.isEmpty()) {
                 LogHeader(id, false);
             }
-            outFile_ << "." << id << " ";
-            outFile_ << std::fixed << std::setprecision(9) << currTime << ",";
-            outFile_.unsetf(std::ios_base::floatfield);
+            LogReportCommon(id, currTime);
             outFile_ << extender.extend(pValue->sequence) << ",";
 
             outFile_ << static_cast<uint32_t>(pValue->un.personalActivityClassifier.mostLikelyState) << ",";
@@ -249,9 +247,7 @@ void DsfLogger::logSensorValue(sh2_SensorValue_t* pValue, double currTime) {
             if (extender.isEmpty()) {
                 LogHeader(id, false);
             }
-            outFile_ << "." << id << " ";
-            outFile_ << std::fixed << std::setprecision(9) << currTime << ",";
-            outFile_.unsetf(std::ios_base::floatfield);
+            LogReportCommon(id, currTime);
             outFile_ << extender.extend(pValue->sequence) << ",";
             outFile_ << pValue->un.stepDetector.latency << ",";
             outFile_ << static_cast<uint32_t>(pValue->status) << "\n";
@@ -263,9 +259,7 @@ void DsfLogger::logSensorValue(sh2_SensorValue_t* pValue, double currTime) {
             if (extender.isEmpty()) {
                 LogHeader(id, false);
             }
-            outFile_ << "." << id << " ";
-            outFile_ << std::fixed << std::setprecision(9) << currTime << ",";
-            outFile_.unsetf(std::ios_base::floatfield);
+            LogReportCommon(id, currTime);
             outFile_ << extender.extend(pValue->sequence) << ",";
             outFile_ << pValue->un.stepCounter.steps << ",";
             outFile_ << pValue->un.stepCounter.latency << ",";
@@ -278,9 +272,7 @@ void DsfLogger::logSensorValue(sh2_SensorValue_t* pValue, double currTime) {
             if (extender.isEmpty()) {
                 LogHeader(id);
             }
-            outFile_ << "." << id << " ";
-            outFile_ << std::fixed << std::setprecision(9) << currTime << ",";
-            outFile_.unsetf(std::ios_base::floatfield);
+            LogReportCommon(id, currTime);
             outFile_ << extender.extend(pValue->sequence) << ",";
             if (orientationNed_) {
                 outFile_ << pValue->un.rotationVector.real << ",";
@@ -302,9 +294,7 @@ void DsfLogger::logSensorValue(sh2_SensorValue_t* pValue, double currTime) {
             if (extender.isEmpty()) {
                 LogHeader(id);
             }
-            outFile_ << "." << id << " ";
-            outFile_ << std::fixed << std::setprecision(9) << currTime << ",";
-            outFile_.unsetf(std::ios_base::floatfield);
+            LogReportCommon(id, currTime);
             outFile_ << extender.extend(pValue->sequence) << ",";
             if (orientationNed_) {
                 outFile_ << pValue->un.gyroIntegratedRV.real << ",";
@@ -331,9 +321,7 @@ void DsfLogger::logSensorValue(sh2_SensorValue_t* pValue, double currTime) {
             if (extender.isEmpty()) {
                 LogHeader(id);
             }
-            outFile_ << "." << id << " ";
-            outFile_ << std::fixed << std::setprecision(9) << currTime << ",";
-            outFile_.unsetf(std::ios_base::floatfield);
+            LogReportCommon(id, currTime);
             outFile_ << extender.extend(pValue->sequence) << ",";
             if (orientationNed_) {
                 outFile_ << pValue->un.gameRotationVector.real << ",";
@@ -354,9 +342,7 @@ void DsfLogger::logSensorValue(sh2_SensorValue_t* pValue, double currTime) {
             if (extender.isEmpty()) {
                 LogHeader(id);
             }
-            outFile_ << "." << id << " ";
-            outFile_ << std::fixed << std::setprecision(9) << currTime << ",";
-            outFile_.unsetf(std::ios_base::floatfield);
+            LogReportCommon(id, currTime);
             outFile_ << extender.extend(pValue->sequence) << ",";
             if (orientationNed_) {
                 outFile_ << pValue->un.geoMagRotationVector.real << ",";
@@ -379,9 +365,7 @@ void DsfLogger::logSensorValue(sh2_SensorValue_t* pValue, double currTime) {
             if (extender.isEmpty()) {
                 LogHeader(id);
             }
-            outFile_ << "." << id << " ";
-            outFile_ << std::fixed << std::setprecision(9) << currTime << ",";
-            outFile_.unsetf(std::ios_base::floatfield);
+            LogReportCommon(id, currTime);
             outFile_ << extender.extend(pValue->sequence) << ",";
             outFile_ << pValue->un.rawAccelerometer.x << ",";
             outFile_ << pValue->un.rawAccelerometer.y << ",";
@@ -393,9 +377,7 @@ void DsfLogger::logSensorValue(sh2_SensorValue_t* pValue, double currTime) {
             if (extender.isEmpty()) {
                 LogHeader(id);
             }
-            outFile_ << "." << id << " ";
-            outFile_ << std::fixed << std::setprecision(9) << currTime << ",";
-            outFile_.unsetf(std::ios_base::floatfield);
+            LogReportCommon(id, currTime);
             outFile_ << extender.extend(pValue->sequence) << ",";
             outFile_ << pValue->un.rawGyroscope.x << ",";
             outFile_ << pValue->un.rawGyroscope.y << ",";
@@ -408,9 +390,7 @@ void DsfLogger::logSensorValue(sh2_SensorValue_t* pValue, double currTime) {
             if (extender.isEmpty()) {
                 LogHeader(id);
             }
-            outFile_ << "." << id << " ";
-            outFile_ << std::fixed << std::setprecision(9) << currTime << ",";
-            outFile_.unsetf(std::ios_base::floatfield);
+            LogReportCommon(id, currTime);
             outFile_ << extender.extend(pValue->sequence) << ",";
             outFile_ << pValue->un.rawMagnetometer.x << ",";
             outFile_ << pValue->un.rawMagnetometer.y << ",";
@@ -422,9 +402,7 @@ void DsfLogger::logSensorValue(sh2_SensorValue_t* pValue, double currTime) {
             if (extender.isEmpty()) {
                 LogHeader(id);
             }
-            outFile_ << "." << id << " ";
-            outFile_ << std::fixed << std::setprecision(9) << currTime << ",";
-            outFile_.unsetf(std::ios_base::floatfield);
+            LogReportCommon(id, currTime);
             outFile_ << extender.extend(pValue->sequence) << ",";
             if (orientationNed_) {
                 outFile_ << pValue->un.accelerometer.y << ","; // ENU -> NED
@@ -443,9 +421,7 @@ void DsfLogger::logSensorValue(sh2_SensorValue_t* pValue, double currTime) {
             if (extender.isEmpty()) {
                 LogHeader(id);
             }
-            outFile_ << "." << id << " ";
-            outFile_ << std::fixed << std::setprecision(9) << currTime << ",";
-            outFile_.unsetf(std::ios_base::floatfield);
+            LogReportCommon(id, currTime);
             outFile_ << extender.extend(pValue->sequence) << ",";
             if (orientationNed_) {
                 outFile_ << pValue->un.gyroscopeUncal.y << ","; // ENU -> NED
@@ -470,9 +446,7 @@ void DsfLogger::logSensorValue(sh2_SensorValue_t* pValue, double currTime) {
             if (extender.isEmpty()) {
                 LogHeader(id);
             }
-            outFile_ << "." << id << " ";
-            outFile_ << std::fixed << std::setprecision(9) << currTime << ",";
-            outFile_.unsetf(std::ios_base::floatfield);
+            LogReportCommon(id, currTime);
             outFile_ << extender.extend(pValue->sequence) << ",";
             if (orientationNed_) {
                 outFile_ << pValue->un.gyroscope.y << ","; // ENU -> NED
@@ -491,9 +465,7 @@ void DsfLogger::logSensorValue(sh2_SensorValue_t* pValue, double currTime) {
             if (extender.isEmpty()) {
                 LogHeader(id);
             }
-            outFile_ << "." << id << " ";
-            outFile_ << std::fixed << std::setprecision(9) << currTime << ",";
-            outFile_.unsetf(std::ios_base::floatfield);
+            LogReportCommon(id, currTime);
             outFile_ << extender.extend(pValue->sequence) << ",";
             if (orientationNed_) {
                 outFile_ << pValue->un.magneticField.y << ","; // ENU -> NED
@@ -512,9 +484,7 @@ void DsfLogger::logSensorValue(sh2_SensorValue_t* pValue, double currTime) {
             if (extender.isEmpty()) {
                 LogHeader(id);
             }
-            outFile_ << "." << id << " ";
-            outFile_ << std::fixed << std::setprecision(9) << currTime << ",";
-            outFile_.unsetf(std::ios_base::floatfield);
+            LogReportCommon(id, currTime);
             outFile_ << extender.extend(pValue->sequence) << ",";
             if (orientationNed_) {
                 outFile_ << pValue->un.magneticFieldUncal.y << ","; // ENU -> NED
@@ -540,9 +510,7 @@ void DsfLogger::logSensorValue(sh2_SensorValue_t* pValue, double currTime) {
             if (extender.isEmpty()) {
                 LogHeader(id);
             }
-            outFile_ << "." << id << " ";
-            outFile_ << std::fixed << std::setprecision(9) << currTime << ",";
-            outFile_.unsetf(std::ios_base::floatfield);
+            LogReportCommon(id, currTime);
             outFile_ << extender.extend(pValue->sequence) << ",";
             if (orientationNed_) {
                 outFile_ << pValue->un.linearAcceleration.y << ","; // ENU -> NED
@@ -562,9 +530,7 @@ void DsfLogger::logSensorValue(sh2_SensorValue_t* pValue, double currTime) {
             if (extender.isEmpty()) {
                 LogHeader(id);
             }
-            outFile_ << "." << id << " ";
-            outFile_ << std::fixed << std::setprecision(9) << currTime << ",";
-            outFile_.unsetf(std::ios_base::floatfield);
+            LogReportCommon(id, currTime);
             outFile_ << extender.extend(pValue->sequence) << ",";
             if (orientationNed_) {
                 outFile_ << pValue->un.gravity.y << ","; // ENU -> NED
@@ -584,9 +550,7 @@ void DsfLogger::logSensorValue(sh2_SensorValue_t* pValue, double currTime) {
             if (extender.isEmpty()) {
                 LogHeader(id);
             }
-            outFile_ << "." << id << " ";
-            outFile_ << std::fixed << std::setprecision(9) << currTime << ",";
-            outFile_.unsetf(std::ios_base::floatfield);
+            LogReportCommon(id, currTime);
             outFile_ << extender.extend(pValue->sequence) << ",";
             if (orientationNed_) {
                 outFile_ << pValue->un.arvrStabilizedRV.real << ",";
@@ -609,9 +573,7 @@ void DsfLogger::logSensorValue(sh2_SensorValue_t* pValue, double currTime) {
             if (extender.isEmpty()) {
                 LogHeader(id);
             }
-            outFile_ << "." << id << " ";
-            outFile_ << std::fixed << std::setprecision(9) << currTime << ",";
-            outFile_.unsetf(std::ios_base::floatfield);
+            LogReportCommon(id, currTime);
             outFile_ << extender.extend(pValue->sequence) << ",";
             if (orientationNed_) {
                 outFile_ << pValue->un.arvrStabilizedGRV.real << ",";
@@ -655,4 +617,13 @@ void DsfLogger::LogHeader(uint8_t sensorId, bool orientation) {
         }
     }
     outFile_ << "!" << static_cast<int32_t>(sensorId) << " name=\"" << name << "\"\n";
+}
+
+// -------------------------------------------------------------------------------------------------
+// DsfLogger::LogReportCommon
+// -------------------------------------------------------------------------------------------------
+void DsfLogger::LogReportCommon(uint32_t sensorId, double currTime) {
+    outFile_ << "." << sensorId << " ";
+    outFile_ << std::fixed << std::setprecision(9) << currTime << ",";
+    outFile_.unsetf(std::ios_base::floatfield);
 }

@@ -51,6 +51,7 @@ private:
     bool orientationNed_;
 
     void LogHeader(uint8_t sensorId, bool orientation = true);
+    void LogReportCommon(uint32_t sensorId, double currTime);
 };
 
 #endif // DSF_LOGGER_H
