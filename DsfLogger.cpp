@@ -47,11 +47,11 @@ static const sensorDsfHeader_s SensorDsfHeader_[] = {
     { "UncalibratedGyroscope", "ANG_VEL[xyz]{rad/s},BIAS[xyz]{rad/s}" },                                        // 0x07
     { "GameRotationVector", "ANG_POS_GLOBAL[wxyz]{quaternion}" },                                               // 0x08
     { "GeomagneticRotationVector", "ANG_POS_GLOBAL[wxyz]{quaternion},ANG_POS_ACCURACY[x]{deg},STATUS[x]" },     // 0x09
-    { "Pressure", "" },                                                                                         // 0x0A
-    { "Ambient Light", "" },                                                                                    // 0x0B
-    { "Humidity", "" },                                                                                         // 0x0C
-    { "Proximity", "" },                                                                                        // 0x0D
-    { "Temperature", "" },                                                                                      // 0x0E
+    { "Pressure", "PRESSURE[x]{hPa},STATUS[x]" },                                                               // 0x0A
+    { "AmbientLight", "AMBIENT_LIGHT[x]{lux},STATUS[x]" },                                                      // 0x0B
+    { "Humidity", "HUMIDITY[x]{%},STATUS[x]" },                                                                 // 0x0C
+    { "Proximity", "PROXIMITY[x]{cm},STATUS[x]" },                                                              // 0x0D
+    { "Temperature", "TEMPERATURE[x]{degC},STATUS[x]" },                                                        // 0x0E
     { "UncalibratedMagField", "MAG_UNCAL[xyz]{m/s^2},MAG_BAIS[xyz]{m/s^2},STATUS[x]" },                         // 0x0F
     { "TapDetector", "TAP_DETECTOR[x]{state},STATUS[x]" },                                                      // 0x10
     { "StepCounter", "STEPS[x]{steps}, STEP_COUNTER_LATENCY[x]{us},STATUS[x]" },                                // 0x11
@@ -706,6 +706,66 @@ void DsfLogger::logSensorValue(sh2_SensorValue_t* pValue, double currTime) {
             LogReportCommon(id, currTime);
             outFile_ << extender.extend(pValue->sequence) << ",";
             outFile_ << pValue->un.stabilityDetector.stability << ",";
+            outFile_ << static_cast<uint32_t>(pValue->status) << "\n";
+            break;
+        }
+
+        case SH2_PRESSURE: {
+            static SampleIdExtender extender;
+            if (extender.isEmpty()) {
+                LogHeader(id, false);
+            }
+            LogReportCommon(id, currTime);
+            outFile_ << extender.extend(pValue->sequence) << ",";
+            outFile_ << pValue->un.pressure.value << ",";
+            outFile_ << static_cast<uint32_t>(pValue->status) << "\n";
+            break;
+        }
+
+        case SH2_AMBIENT_LIGHT: {
+            static SampleIdExtender extender;
+            if (extender.isEmpty()) {
+                LogHeader(id, false);
+            }
+            LogReportCommon(id, currTime);
+            outFile_ << extender.extend(pValue->sequence) << ",";
+            outFile_ << pValue->un.ambientLight.value << ",";
+            outFile_ << static_cast<uint32_t>(pValue->status) << "\n";
+            break;
+        }
+
+        case SH2_HUMIDITY: {
+            static SampleIdExtender extender;
+            if (extender.isEmpty()) {
+                LogHeader(id, false);
+            }
+            LogReportCommon(id, currTime);
+            outFile_ << extender.extend(pValue->sequence) << ",";
+            outFile_ << pValue->un.humidity.value << ",";
+            outFile_ << static_cast<uint32_t>(pValue->status) << "\n";
+            break;
+        }
+
+        case SH2_PROXIMITY: {
+            static SampleIdExtender extender;
+            if (extender.isEmpty()) {
+                LogHeader(id, false);
+            }
+            LogReportCommon(id, currTime);
+            outFile_ << extender.extend(pValue->sequence) << ",";
+            outFile_ << pValue->un.proximity.value << ",";
+            outFile_ << static_cast<uint32_t>(pValue->status) << "\n";
+            break;
+        }
+
+        case SH2_TEMPERATURE: {
+            static SampleIdExtender extender;
+            if (extender.isEmpty()) {
+                LogHeader(id, false);
+            }
+            LogReportCommon(id, currTime);
+            outFile_ << extender.extend(pValue->sequence) << ",";
+            outFile_ << pValue->un.temperature.value << ",";
             outFile_ << static_cast<uint32_t>(pValue->status) << "\n";
             break;
         }
