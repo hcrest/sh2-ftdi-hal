@@ -681,7 +681,7 @@ void DsfLogger::logSensorValue(sh2_SensorValue_t* pValue, double currTime) {
             }
             LogReportCommon(id, currTime);
             outFile_ << extender.extend(pValue->sequence) << ",";
-            outFile_ << pValue->un.sleepDetector.sleepState << ",";
+            outFile_ << static_cast<uint32_t>(pValue->un.sleepDetector.sleepState) << ",";
             outFile_ << static_cast<uint32_t>(pValue->status) << "\n";
             break;
         }
