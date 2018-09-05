@@ -86,14 +86,12 @@ void usage(const char* myname) {
             "   --calibrated         - include calibrated output sensors\n"
             "   --uncalibrated       - include uncalibrated output sensors\n"
             "   --mode=<mode>        - sensors types to log.  9agm, 6ag, 6am, 6gm, 3a, 3g, 3m or all.\n"
-            "   --step               - include step detector and step counter.\n"
-            "   --pac                - include activity classifier.\n"
             "   --dcdAutoSave        - enable DCD auto saving.  No dcd save by default.\n"
             "   --clearDcd           - clear DCD and reset upon startup.\n"
             "   --calEnable=0x<mask> - cal enable mask.  Bits: Planar, A, G, M.  Default 0x8\n"
             "   --orientation=<orientation> - system orientation. enu, ned. Default: ned\n"
             "   --batch=<filePath>   - get the list of sensors from the batch file specified. "
-            "When enabled, the raw, calibrated, uncalibrated, mode, step and pac options are ignored.\n",
+            "When enabled, the raw, calibrated, uncalibrated and mode options are ignored.\n",
             myname);
 }
 
@@ -148,10 +146,6 @@ int main(int argc, const char* argv[]) {
                     fprintf(stderr, "Unknown mode: %s\n", arg);
                     argError = true;
                 }
-            } else if (strcmp(arg, "--step") == 0) {
-                appConfig.step = true;
-            } else if (strcmp(arg, "--pac") == 0) {
-                appConfig.pac = true;
             } else if (strcmp(arg, "--dcdAutoSave") == 0) {
                 appConfig.dcdAutoSave = true;
             } else if (strcmp(arg, "--clearDcd") == 0) {

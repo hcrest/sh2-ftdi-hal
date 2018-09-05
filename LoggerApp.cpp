@@ -111,7 +111,7 @@ static sh2_Hal_t sh2Hal_ = {
 	Sh2HalGetTimeUs,
 };
 
-frsString_s bno080Frs_[] = {
+static const frsString_s bno080Frs_[] = {
         // { STATIC_CALIBRATION_AGM, "scd" },
         {NOMINAL_CALIBRATION, "nominal_scd"},
         {DYNAMIC_CALIBRATION, "dcd"},
@@ -361,18 +361,9 @@ int LoggerApp::init(appConfig_s* appConfig, TimerSrv* timer, FtdiHal* ftdiHal, D
         ProcessConfigFile(&sensorsToEnable_, appConfig);
     }
 
-    // Update the list of enabled sensors based on the mode/step/pac options
+    // Update the list of enabled sensors based on the mode options
     if (!appConfig->batch) {
         UpdateSensorList(&sensorsToEnable_, appConfig);
-
-        if (appConfig->pac) {
-            sensorsToEnable_.push_back(SH2_PERSONAL_ACTIVITY_CLASSIFIER);
-        }
-
-        if (appConfig->step) {
-            sensorsToEnable_.push_back(SH2_STEP_DETECTOR);
-            sensorsToEnable_.push_back(SH2_STEP_COUNTER);
-        }
     }
 
     // Enable Sensors
@@ -713,7 +704,7 @@ void LoggerApp::LogAllFrsBNO080() {
         LogFrs(NOMINAL_CALIBRATION, "scd");
     }
 
-    frsString_s* pFrs;
+    const frsString_s* pFrs;
     for (int i = 0; i < sizeof(bno080Frs_) / sizeof(frsString_s); i++) {
         pFrs = &bno080Frs_[i];
         LogFrs(pFrs->recordId, pFrs->name);
