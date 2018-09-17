@@ -14,37 +14,28 @@ set(CMAKE_CXX_STANDARD 11)
 # Be able to find our generated header file.
 include_directories("${CMAKE_CURRENT_BINARY_DIR}")
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}")
-include_directories("${CMAKE_CURRENT_SOURCE_DIR}/sh2")
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}/../sh2")
 
 link_directories("${CMAKE_CURRENT_SOURCE_DIR}")
 
-
 # Build 
 if(WIN32)
-add_library(sh2_ftdi_hal
-    FtdiHalWin.cpp
-	FtdiHal.cpp
-	TimerServiceWin.cpp
-	ftd2xx.h
-	Rfc1662Framer.cpp
-	sh2/sh2.c
-	sh2/sh2_SensorValue.c
-	sh2/sh2_util.c
-	sh2/shtp.c
-	)
+set(PLATFORM_CODE Win)
 else()
+set(PLATFORM_CODE Rpi)
+endif()
+
 add_library(sh2_ftdi_hal
-    FtdiHalRpi.cpp
+    FtdiHal${PLATFORM_CODE}.cpp
 	FtdiHal.cpp
-	TimerServiceRpi.cpp
+	TimerService${PLATFORM_CODE}.cpp
 	ftd2xx.h
 	Rfc1662Framer.cpp
-	sh2/sh2.c
-	sh2/sh2_SensorValue.c
-	sh2/sh2_util.c
-	sh2/shtp.c
-	)
-endif()
+	../sh2/sh2.c
+	../sh2/sh2_SensorValue.c
+	../sh2/sh2_util.c
+	../sh2/shtp.c
+)
 
 if(WIN32)
 	if(CMAKE_CL_64)
