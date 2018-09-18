@@ -64,7 +64,7 @@ protected:
     TimerSrv* timer_;
     Rfc1662Framer framer_;
 
-    uint8_t decodeBuf_[1024 + 512]; // TODO
+    uint8_t decodeBuf_[1024 + 512]; // TODO Adjust the buffer size
     uint8_t nRemainMsg_;
     uint8_t* pNextMsg_;
     uint32_t lastSampleTime_us_;
