@@ -33,9 +33,15 @@ public:
 	explicit FtdiHalRpi() : FtdiHal() {};
 	virtual ~FtdiHalRpi() {};
 
-	// inheriate from FtdiHal
+	// inherit from FtdiHal
 	virtual int open();
 	virtual void close();
+	
+    virtual int init(int deviceIdx, TimerSrv* timer);
+    virtual int init(const char* device, TimerSrv* timer);
+
+protected:
+    const char* device_;
 
 private:
 	virtual int ReadBytesToDevice(void);

@@ -77,12 +77,10 @@ int FtdiHalRpi::open() {
 
     struct termios tty;
     speed_t baud = B3000000;
-    char device[15];
-    snprintf(device, 15, "/dev/ttyUSB%d", deviceIdx_);
 
     // we dont know how many bytes to read. blocked by interrupt poll
-    if ((deviceDescriptor = ::open(device, O_RDWR | O_NOCTTY | O_NONBLOCK)) == -1) {
-        uart_errno_printf("uart_connect: OPEN %s:", device);
+    if ((deviceDescriptor = ::open(device_, O_RDWR | O_NOCTTY | O_NONBLOCK)) == -1) {
+        uart_errno_printf("uart_connect: OPEN %s:", device_);
         return -1;
     }
 
@@ -131,6 +129,24 @@ int FtdiHalRpi::open() {
 // -------------------------------------------------------------------------------------------------
 void FtdiHalRpi::close() {
     ::close(deviceDescriptor);
+}
+
+// -------------------------------------------------------------------------------------------------
+// FtdiHalRpi::init
+// -------------------------------------------------------------------------------------------------
+int FtdiHalRpi::init(int deviceIdx, TimerSrv* timer) {
+
+    char device[15];
+    snprintf(device, 15, "/dev/ttyUSB%d", deviceIdx);
+    
+    device_ = device;
+    return FtdiHal::init(deviceIdx, timer);
+}
+
+int FtdiHalRpi::init(const char * device, TimerSrv* timer) {
+
+    device_ = device;
+    return FtdiHal::init(0, timer);
 }
 
 
