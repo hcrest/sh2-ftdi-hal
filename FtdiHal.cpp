@@ -18,9 +18,11 @@
 #include "FtdiHal.h"
 #include "TimerService.h"
 
-#include <string.h>
+#include <chrono>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include <thread>
 
 
 // =================================================================================================
@@ -62,7 +64,7 @@ int FtdiHal::init(int deviceIdx, TimerSrv* timer) {
 // -------------------------------------------------------------------------------------------------
 void FtdiHal::softreset() {
     UCHAR cmd1[] = {0x01, 0x05, 0x00, 0x01, 1, 0x01};
-    WriteData(cmd1, sizeof(cmd1));
+    writeData(cmd1, sizeof(cmd1));
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -82,24 +84,16 @@ void FtdiHal::close() {
 // FtdiHal::read
 // -------------------------------------------------------------------------------------------------
 int FtdiHal::read(uint8_t* pBuffer, unsigned len, uint32_t* t_us) {
+    // Return the buffered decoded messages minus one SHTP-UART header byte
+    return ReadMessage(pBuffer, len, t_us, 1);
+}
 
-	int rtnLen = 0;
-
-	// Return the buffered decoded messages
-	rtnLen = GetNextMessage(pBuffer, len, t_us);
-	if (rtnLen) {
-		return rtnLen;
-	}
-
-	int nMsg = ReadBytesToDevice();
-    
-    if (nMsg) {
-        nRemainMsg_ = nMsg;
-        pNextMsg_ = decodeBuf_;
-        lastSampleTime_us_ = (uint32_t)timer_->getTimestamp_us();
-    }
-
-	return GetNextMessage(pBuffer, len, t_us);
+// -------------------------------------------------------------------------------------------------
+// FtdiHal::readData
+// -------------------------------------------------------------------------------------------------
+int FtdiHal::readData(uint8_t* pBuffer, unsigned len, uint32_t* t_us) {
+    // Return the buffered decoded messages with all header bytes
+    return ReadMessage(pBuffer, len, t_us, 0);
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -114,16 +108,40 @@ int FtdiHal::write(uint8_t* pBuffer, unsigned len) {
 
     UCHAR headerData[] = {0x1}; // SHTP over UART header byte
     DWORD headerLength = sizeof(headerData);
+
     UCHAR* dataWithHeader = (UCHAR*)malloc(headerLength + len);
 
     memcpy(dataWithHeader, headerData, headerLength);
     memcpy(dataWithHeader + headerLength, pBuffer, len);
 
-    WriteData(dataWithHeader, headerLength + len);
+    writeData(dataWithHeader, headerLength + len);
 
     free(dataWithHeader);
 
     return len;
+}
+
+// -------------------------------------------------------------------------------------------------
+// FtdiHal::writeData
+// -------------------------------------------------------------------------------------------------
+// send some data to the device.  data will be encoded/framed.
+// -------------------------------------------------------------------------------------------------
+int FtdiHal::writeData(uint8_t* bytes, unsigned length) {
+    UCHAR* encodedFrame = (UCHAR*)malloc((length * 2 + 2) * sizeof(UCHAR));
+    size_t encodedLength = 0;
+
+#if TRACE_IO
+    fprintf(stderr, "[encode  => ] ");
+    PrintBytes(bytes, length);
+#endif
+
+    encodedLength = framer_.encode((uint8_t*)encodedFrame, (uint8_t*)bytes, length);
+
+    WriteEncodedFrame(encodedFrame, (DWORD)(encodedLength));
+
+    free(encodedFrame);
+
+    return length;
 }
 
 
@@ -134,27 +152,13 @@ int FtdiHal::write(uint8_t* pBuffer, unsigned len) {
 // FtdiHal::PrintBytes
 // -------------------------------------------------------------------------------------------------
 void FtdiHal::PrintBytes(uint8_t* bytes, DWORD len) {
+    fprintf(stderr, "(%d) b'", len);
     for (DWORD i = 0; i < len; ++i) {
-        fprintf(stderr, "%02x ", bytes[i]);
+        fprintf(stderr, "%02x", bytes[i]);
     }
-    fprintf(stderr, "\n");
+    fprintf(stderr, "'\n");
 }
 
-// -------------------------------------------------------------------------------------------------
-// FtdiHal::WriteData
-// -------------------------------------------------------------------------------------------------
-// send some data to the device.  data will be encoded/framed.
-// -------------------------------------------------------------------------------------------------
-void FtdiHal::WriteData(UCHAR* bytes, DWORD length) {
-    UCHAR* encodedFrame = (UCHAR*)malloc((length * 2 + 2) * sizeof(UCHAR));
-    size_t encodedLength = 0;
-
-    encodedLength = framer_.encode((uint8_t*)encodedFrame, (uint8_t*)bytes, length);
-
-    WriteEncodedFrame(encodedFrame, (DWORD)(encodedLength));
-
-    free(encodedFrame);
-}
 
 // -------------------------------------------------------------------------------------------------
 // FtdiHal::WriteEncodedFrame
@@ -165,10 +169,6 @@ void FtdiHal::WriteEncodedFrame(UCHAR* bytes, DWORD length) {
     DWORD bytesToWrite = length;
     DWORD bytesWritten = 0;
 
-#if TRACE_IO
-    fprintf(stderr, "write bytes: ");
-    PrintBytes(bytes, length);
-#endif
 
     // write bytes individually so hub can keep up
     for (DWORD i = 0; i < length; i++) {
@@ -180,19 +180,46 @@ void FtdiHal::WriteEncodedFrame(UCHAR* bytes, DWORD length) {
 }
 
 // -------------------------------------------------------------------------------------------------
+// FtdiHal::ReadMessage
+// -------------------------------------------------------------------------------------------------
+int FtdiHal::ReadMessage(uint8_t* pBuffer, unsigned len, uint32_t* t_us, uint8_t stripHeaderLen) {
+
+    int rtnLen = 0;
+
+    // Return the buffered decoded messages minus header bytes
+    rtnLen = GetNextMessage(pBuffer, len, t_us, stripHeaderLen);
+    if (rtnLen) {
+        return rtnLen;
+    }
+
+    int nMsg = ReadBytesToDevice();
+
+    if (nMsg) {
+        nRemainMsg_ = nMsg;
+        pNextMsg_ = decodeBuf_;
+        lastSampleTime_us_ = (uint32_t)timer_->getTimestamp_us();
+    }
+
+    return GetNextMessage(pBuffer, len, t_us, stripHeaderLen);
+}
+
+// -------------------------------------------------------------------------------------------------
 // FtdiHal::GetNextMessage
 // -------------------------------------------------------------------------------------------------
-int FtdiHal::GetNextMessage(uint8_t* pBuffer, unsigned len, uint32_t* t_us) {
+int FtdiHal::GetNextMessage(uint8_t* pBuffer,
+                            unsigned len,
+                            uint32_t* t_us,
+                            uint8_t stripHeaderLen) {
     int payloadLen = 0;
 
     if (nRemainMsg_) {
-        payloadLen = ((*(pNextMsg_ + 1) << 8) | *(pNextMsg_)) - 1;
-        memcpy(pBuffer, pNextMsg_ + 3, payloadLen);
+        payloadLen = ((*(pNextMsg_ + 1) << 8) | *(pNextMsg_)) - stripHeaderLen;
+        memcpy(pBuffer, pNextMsg_ + 2 + stripHeaderLen, payloadLen);
         *t_us = lastSampleTime_us_;
 
         nRemainMsg_--;
         if (nRemainMsg_) {
-            pNextMsg_ += (3 + payloadLen);
+            pNextMsg_ += (2 + stripHeaderLen + payloadLen);
         }
     }
     return payloadLen;

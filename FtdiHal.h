@@ -26,9 +26,9 @@
 
 #include "Rfc1662Framer.h"
 
- // =================================================================================================
- // DATA TYPES
- // =================================================================================================
+// =================================================================================================
+// DATA TYPES
+// =================================================================================================
 class TimerSrv;
 
 // =================================================================================================
@@ -36,8 +36,8 @@ class TimerSrv;
 // =================================================================================================
 class FtdiHal {
 public:
-    explicit FtdiHal() : deviceIdx_(0) {};
-    virtual ~FtdiHal() {};
+    explicit FtdiHal() : deviceIdx_(0){};
+    virtual ~FtdiHal(){};
 
     /**
     * @brief Initialize the FTDI HAL
@@ -49,15 +49,20 @@ public:
     virtual int init(int deviceIdx, TimerSrv* timer);
 
     // send soft reset command
-	virtual void softreset();
+    virtual void softreset();
 
-	virtual int open();
+    virtual int open();
 
-	virtual void close();
+    virtual void close();
 
-	virtual int read(uint8_t* pBuffer, unsigned len, uint32_t* t_us);
+    virtual int read(uint8_t* pBuffer, unsigned len, uint32_t* t_us);
 
-	virtual int write(uint8_t* pBuffer, unsigned len);
+    virtual int write(uint8_t* pBuffer, unsigned len);
+
+    // these functions allow read/write data including header
+    virtual int writeData(uint8_t* pBuffer, unsigned len);
+    virtual int readData(uint8_t* pBuffer, unsigned len, uint32_t* t_us);
+
 
 protected:
     int deviceIdx_;
@@ -68,19 +73,21 @@ protected:
     uint8_t nRemainMsg_;
     uint8_t* pNextMsg_;
     uint32_t lastSampleTime_us_;
+    uint8_t bridgeHostInterfaceId_;
 
-	virtual int GetNextMessage(uint8_t* pBuffer, unsigned len, uint32_t* t_us);
+    virtual int ReadMessage(uint8_t* pBuffer, unsigned len, uint32_t* t_us, uint8_t stripHeaderLen);
+    virtual int GetNextMessage(uint8_t* pBuffer, unsigned len, uint32_t* t_us, uint8_t stripHeaderLen);
 
-	virtual int ReadBytesToDevice(void) = 0;
+    virtual int ReadBytesToDevice(void) = 0;
 
-	virtual void WriteData(UCHAR* bytes, DWORD length);
-	virtual void WriteEncodedFrame(UCHAR* bytes, DWORD length);
-	virtual BOOL WriteBytesToDevice(LPVOID lpBuffer,
-                            DWORD nNumberOfBytesToWrite,
-                            LPDWORD lpNumberOfBytesWritten) = 0;
+    
+    virtual void WriteEncodedFrame(UCHAR* bytes, DWORD length);
+    virtual BOOL WriteBytesToDevice(LPVOID lpBuffer,
+                                    DWORD nNumberOfBytesToWrite,
+                                    LPDWORD lpNumberOfBytesWritten) = 0;
 
-	// Helper Function
-	virtual void PrintBytes(uint8_t* bytes, DWORD len);
+    // Helper Function
+    virtual void PrintBytes(uint8_t* bytes, DWORD len);
 };
 
 #endif // FTDI_HAL_H
