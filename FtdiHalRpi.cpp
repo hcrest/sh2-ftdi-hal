@@ -135,10 +135,8 @@ void FtdiHalRpi::close() {
 // FtdiHalRpi::init
 // -------------------------------------------------------------------------------------------------
 int FtdiHalRpi::init(int deviceIdx, TimerSrv* timer) {
-
-    char device[15];
+    static char device[15];
     snprintf(device, 15, "/dev/ttyUSB%d", deviceIdx);
-    
     device_ = device;
     return FtdiHal::init(deviceIdx, timer);
 }
