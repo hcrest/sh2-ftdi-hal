@@ -49,7 +49,6 @@
 // FtdiHal::init
 // -------------------------------------------------------------------------------------------------
 int FtdiHal::init(int deviceIdx, TimerSrv* timer) {
-
     deviceIdx_ = deviceIdx; // TODO
     timer_ = timer;
     nRemainMsg_ = 0;
@@ -222,5 +221,11 @@ int FtdiHal::GetNextMessage(uint8_t* pBuffer,
             pNextMsg_ += (2 + stripHeaderLen + payloadLen);
         }
     }
+#if TRACE_IO
+    if (payloadLen > 0) {
+        fprintf(stderr, "[ <= decode ] ");
+        PrintBytes(pBuffer, payloadLen);
+    }
+#endif
     return payloadLen;
 }
