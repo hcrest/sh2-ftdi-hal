@@ -48,8 +48,6 @@
 // =================================================================================================
 // LOCAL VARIABLES
 // =================================================================================================
-static int deviceDescriptor = -1;
-static EVENT_HANDLE commEvent;
 
 // =================================================================================================
 // LOCAL FUNCTIONS PROTOTYPES
@@ -79,12 +77,12 @@ int FtdiHalRpi::open() {
     speed_t baud = B3000000;
 
     // we dont know how many bytes to read. blocked by interrupt poll
-    if ((deviceDescriptor = ::open(device_, O_RDWR | O_NOCTTY | O_NONBLOCK)) == -1) {
+    if ((deviceDescriptor_ = ::open(device_, O_RDWR | O_NOCTTY | O_NONBLOCK)) == -1) {
         uart_errno_printf("uart_connect: OPEN %s:", device_);
         return -1;
     }
-
-    if (tcgetattr(deviceDescriptor, &tty) < 0) {
+    
+    if (tcgetattr(deviceDescriptor_, &tty) < 0) {
         fprintf(stderr, "unable to read port attributes");
         return -1;
     }
@@ -102,17 +100,17 @@ int FtdiHalRpi::open() {
     cfsetispeed(&tty, baud);
     cfsetospeed(&tty, baud);
 
-    if (tcsetattr(deviceDescriptor, TCSANOW, &tty) < 0) {
+    if (tcsetattr(deviceDescriptor_, TCSANOW, &tty) < 0) {
         fprintf(stderr, "unable to set port attributes");
         return -1;
     }
 
-    fsync(deviceDescriptor);
+    fsync(deviceDescriptor_);
 
     // TODO Attemp to resolve the start / long frame issue.
     usleep(2000000);
 
-    if (tcflush(deviceDescriptor, TCIOFLUSH) == 0) {
+    if (tcflush(deviceDescriptor_, TCIOFLUSH) == 0) {
         printf("FLUSHED! \n");
     } else {
         printf("QUESTION! \n");
@@ -128,7 +126,7 @@ int FtdiHalRpi::open() {
 // FtdiHalRpi::close
 // -------------------------------------------------------------------------------------------------
 void FtdiHalRpi::close() {
-    ::close(deviceDescriptor);
+    ::close(deviceDescriptor_);
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -138,6 +136,7 @@ int FtdiHalRpi::init(int deviceIdx, TimerSrv* timer) {
     static char device[15];
     snprintf(device, 15, "/dev/ttyUSB%d", deviceIdx);
     device_ = device;
+    deviceDescriptor_ = -1;
     return FtdiHal::init(deviceIdx, timer);
 }
 
@@ -159,7 +158,7 @@ BOOL FtdiHalRpi::WriteBytesToDevice(LPVOID lpBuffer,
                                  LPDWORD lpNumberOfBytesWritten) {
 
     usleep(BYTE_TX_MIN_SPACE_US);
-    return (::write(deviceDescriptor, lpBuffer, 1) == 1);
+    return (::write(deviceDescriptor_, lpBuffer, 1) == 1);
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -193,7 +192,7 @@ int FtdiHalRpi::ReadBytesToDevice(void) {
 // -------------------------------------------------------------------------------------------------
 int FtdiHalRpi::RpiUartRead(uint8_t* buf, uint32_t buffer_size) {
 
-    if (deviceDescriptor <= 0) {
+    if (deviceDescriptor_ <= 0) {
         return -1;
     }
 
@@ -211,9 +210,9 @@ int FtdiHalRpi::RpiUartRead(uint8_t* buf, uint32_t buffer_size) {
     timeout.tv_usec = 10000;
 
     FD_ZERO(&fds);
-    FD_SET(deviceDescriptor, &fds);
-    // lseek(deviceDescriptor, 0, SEEK_SET);
-    status = select(deviceDescriptor + 1, &fds, NULL, NULL, &timeout);
+    FD_SET(deviceDescriptor_, &fds);
+    // lseek(deviceDescriptor_, 0, SEEK_SET);
+    status = select(deviceDescriptor_ + 1, &fds, NULL, NULL, &timeout);
 
     if ((status < 0)) { // && (errno != EINTR) && (errno != EBADF)
 #if DEBUG_BUFFER
@@ -231,7 +230,7 @@ int FtdiHalRpi::RpiUartRead(uint8_t* buf, uint32_t buffer_size) {
 #endif
 
         int ready = 0;
-        ready = ::read(deviceDescriptor, buf, buffer_size);
+        ready = ::read(deviceDescriptor_, buf, buffer_size);
 #if DEBUG_BUFFER
         if (ready < 0)
             fprintf(stderr, "read errno = %d \n", errno); // (%s) , strerror(errno)

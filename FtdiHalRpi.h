@@ -51,6 +51,8 @@ private:
 		LPDWORD lpNumberOfBytesWritten);
 
     int RpiUartRead(uint8_t* buf, uint32_t buffer_size);
+	
+	int deviceDescriptor_;
 };
 
 #endif // FTDI_HAL_RPI_H
