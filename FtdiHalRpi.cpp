@@ -107,9 +107,6 @@ int FtdiHalRpi::open() {
 
     fsync(deviceDescriptor_);
 
-    // TODO Attemp to resolve the start / long frame issue.
-    usleep(2000000);
-
     if (tcflush(deviceDescriptor_, TCIOFLUSH) == 0) {
         printf("FLUSHED! \n");
     } else {
