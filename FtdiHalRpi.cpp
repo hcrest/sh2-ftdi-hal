@@ -108,9 +108,9 @@ int FtdiHalRpi::open() {
     fsync(deviceDescriptor_);
 
     if (tcflush(deviceDescriptor_, TCIOFLUSH) == 0) {
-        printf("FLUSHED! \n");
+        // printf("FLUSHED! \n");
     } else {
-        printf("QUESTION! \n");
+        // printf("QUESTION! \n");
     }
 
     // Issue Soft reset which triggers SensorHub to send the advertise response
