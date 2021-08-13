@@ -45,8 +45,7 @@ if(WIN32)
 	endif()
 
 else()
-	set(LIBRARIES ${LIBRARIES} 
-	pthread)
+	set(LIBRARIES ${LIBRARIES} pthread rt)
 endif()
 	
 # Link 
