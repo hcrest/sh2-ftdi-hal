@@ -1,0 +1,11 @@
+# Emacs stuff
+*~
+\#*
+
+# CMake stuff
+CMakeFiles/
+Makefile
+cmake_install.cmake
+
+# Built files
+libsh2_ftdi_hal.a
